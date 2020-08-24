@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="css/public.css" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">角色编码</label>
+        <div class="layui-input-block">
+            <input type="text" name="roleCode" lay-verify="required" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">角色名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="roleName" lay-verify="required"  value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">创建日期</label>
+        <div class="layui-input-block">
+            <input type="text" name="createDate" lay-verify="required" readonly="readonly"  value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">是否启用</label>
+        <div class="layui-input-block">
+            <input type="radio" name="isStart" value="1" title="启用" checked="">
+            <input type="radio" name="isStart" value="0" title="不启用">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">创建者</label>
+        <div class="layui-input-block">
+            <input type="email" name="createBy" placeholder="创建者" value="" readonly="readonly" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+</div>
+<script src="lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script>
+
+    layui.use(['layer', 'form','jquery'], function () {
+        var form = layui.form;
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var queryString=window.location.search.substring(1);
+
+        $.ajax({
+            url:"http://localhost:8080/role/findone.do",
+            data:queryString,
+            async: false,
+            type:"post",
+            xhrFields:{
+                withCredentials:true
+            },
+            success:function (rec) {
+
+                $("input[name='roleCode']").val(rec.roleCode);
+                $("input[name='roleName']").val(rec.roleName);
+                $("input[name='createDate']").val(rec.createDate);
+                $("input[name='isStart']").val(rec.isStart);
+                $("input[name='createBy']").val(rec.createBy);
+            }
+        })
+
+        form.on('submit(saveBtn)', function (data) {
+            data = data.field;
+            console.log(data)
+            $.ajax({
+                url:"http://localhost:8080/role/modify.do",
+                type:"post",
+                data:data,
+                dataType:"json",
+                xhrFields:{
+                    withCredentials:true
+                },
+                success:function (rec) {
+
+                    layer.msg(rec.msg);
+                    layui.use('layer', function(){
+                        var layer = layui.layer;
+                        layer.alert("角色修改成功！",
+                            function () {
+                                window.parent.location.reload();//刷新父页面
+                                parent.layer.close(index);//关闭当前的弹窗
+                            }
+                        );
+                    });
+
+                }
+            })
+
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

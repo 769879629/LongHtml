@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="css/public.css" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">商品编码</label>
+        <div class="layui-input-block">
+            <input type="text" name="goodsSN" lay-verify="required" lay-reqtext="不能为空" placeholder="请输入编码" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">商品名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="goodsName" lay-verify="required" lay-reqtext="不能为空" placeholder="请输入名称" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">商品规格</label>
+        <div class="layui-input-block">
+            <input type="text" name="goodsFormat" lay-verify="required"  value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">市场价</label>
+        <div class="layui-input-block">
+            <input type="email" name="marketPrice" placeholder="市场价" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">优惠价</label>
+        <div class="layui-input-block">
+            <input type="email" name="realPrice" placeholder="优惠价" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">状态</label>
+        <div class="layui-input-block">
+            <input type="radio" name="state" value="1" title="上架" checked="">
+            <input type="radio" name="state" value="2" title="下架">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">商品说明</label>
+        <div class="layui-input-block">
+            <input type="text" name="note" placeholder="商品说明" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">库存</label>
+        <div class="layui-input-block">
+            <input type="number" name="num" placeholder="库存" value="" class="layui-input">
+            <tip>只能为数字。</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">单位</label>
+        <div class="layui-input-block">
+            <input type="text" name="unit" placeholder="单位" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">创建人</label>
+        <div class="layui-input-block">
+            <input type="text" name="createdBy" placeholder="创建人" value="" class="layui-input">
+        </div>
+    </div>
+
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+<script src="lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+
+
+        $.ajax({
+            url: "http://localhost:8080/session.do",
+            type: "post",
+            dataType: "json",
+            async: false,
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(rec) {
+                id = rec.data.id;
+                console.log("modifyid="+id);
+            }
+
+        })
+        $.ajax({
+            url:"http://localhost:8080/user/findOne.do?id="+id,
+            type:"post",
+            async: false,
+            xhrFields:{
+                withCredentials:true
+            },
+            success:function (rec) {
+                $("input[name='createdBy']").val(rec.username);
+            }
+        })
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            data = data.field;
+            console.log(data)
+            $.ajax({
+                url:"http://localhost:8080/goods/add.do",
+                type:"post",
+                data:data,
+                dataType:"json",
+                async: false,
+                xhrFields:{
+                    withCredentials:true
+                },
+                success:function (rec) {
+
+                    layer.msg(rec.msg);
+                    layui.use('layer', function(){
+                        var layer = layui.layer;
+                        layer.alert("物品添加成功！",
+                            function () {
+                                window.parent.location.reload();//刷新父页面
+                                parent.layer.close(index);//关闭当前的弹窗
+                            }
+                        );
+                    });
+
+                }
+            })
+
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

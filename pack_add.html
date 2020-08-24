@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>table下拉选择器</title>
+    <link rel="stylesheet" href="lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <form class="layui-form" action="" style="padding:20px;">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">套餐名：</label>
+            <div class="layui-input-block">
+                <input type="text" name="goodsPackName" lay-verify="required"   value="" class="layui-input">
+            </div>
+        </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">选择产品</label>
+                <div class="layui-input-inline">
+                    <input type="text"  name="note" placeholder="请输入" autocomplete="off" class="layui-input" id="demo" value=" " ts-selected=" ">
+                </div>
+            </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label required">套餐总价：</label>
+            <div class="layui-input-block">
+                <input type="number" name="totalPrice" lay-verify="required"   value="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">状态：</label>
+            <div class="layui-input-block">
+                <select id="state" name="state" value=""  >
+                    <option value="1">上架</option>
+                    <option value="2">下架</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">库存：</label>
+            <div class="layui-input-block">
+                <input type="number" name="num" lay-verify="required"   value="" class="layui-input">
+            </div>
+        </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label required">发布人：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="createdBy" lay-verify="required"   value="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+                </div>
+            </div>
+
+
+        </form>
+
+    </div>
+</div>
+
+<script src="lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="js/lay-config.js?v=1.0.4" charset="utf-8"></script>
+<script>
+    layui.use(['table', 'form', 'tableSelect'], function () {
+        var $ = layui.jquery,
+            table = layui.table,
+            form = layui.form,
+            tableSelect = layui.tableSelect;
+        var totalprice=0;
+
+
+
+        $.ajax({
+            url: "http://localhost:8080/session.do",
+            type: "post",
+            dataType: "json",
+            async: false,
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(rec) {
+                id = rec.data.id;
+                console.log("modifyid="+id);
+            }
+
+        })
+        $.ajax({
+            url:"http://localhost:8080/user/findOne.do?id="+id,
+            type:"post",
+            async: false,
+            xhrFields:{
+                withCredentials:true
+            },
+            success:function (rec) {
+                $("input[name='createdBy']").val(rec.username);
+            }
+        })
+
+        tableSelect.render({
+            elem: '#demo',
+            searchKey: 'my',
+            checkedKey: 'id',
+            searchPlaceholder: '自定义文字和name',
+            table: {
+                url: 'http://localhost:8080/goods/findlist.do',
+                parseData:function(res){//res 即为原始返回的数据
+                    console.log(res)
+                    return {
+                        "code":0,
+                        "msg":"",
+                        "count":5,
+                        data:res
+                    };
+                },
+                cols: [[
+                    {type: "checkbox", width: 50},
+                    {field: 'goodsName', width: 120, title: '商品名称', sort: true},
+                    {field: 'goodsFormat', width: 100, title: '商品规格'},
+                    {field: 'marketPrice', width: 100, title: '市场价'},
+                    {field: 'realPrice', width:120, title: '优惠价格',sort: true},
+                    {field: 'state', width: 80, title: '状态',templet: function (item) {
+                            if (item.state == '1') {
+                                return "上架";
+                            } else if (item.state == '2') {
+                                return "下架";
+                            }}},
+                    {field: 'note', width: 120, title: '商品说明'},
+                    {field: 'num', width: 120,edit: 'num',  title: '库存数量'},
+                    {field: 'unit', width: 120, title: '单位'},
+
+                ]],
+            },
+            done: function (elem, data) {
+                var NEWJSON = []
+                layui.each(data.data, function (index, item) {
+                    console.log(item)
+                    NEWJSON.push(item.goodsName)
+                    for (let i = 0; i <2; i++) {
+                        totalprice=item.realPrice*item.realPrice;
+                         $("input[name='totalPrice']").val(totalprice);
+                    }
+
+                })
+                elem.val(NEWJSON.join(","))
+            }
+        })
+
+        form.on('submit(saveBtn)', function (data) {
+            data = data.field;
+            console.log(data)
+            $.ajax({
+                url:"http://localhost:8080/pack/addone.do",
+                type:"post",
+                data:data,
+                dataType:"json",
+                async: false,
+                xhrFields:{
+                    withCredentials:true
+                },
+                success:function (rec) {
+                    layer.msg(rec.msg);
+                    layui.use('layer', function(){
+                        var layer = layui.layer;
+                        layer.alert("套餐添加成功！",
+                            function () {
+                                window.location.reload();//刷新父页面
+
+                            }
+                        );
+                    });
+
+                }
+            })
+
+            return false;
+        });
+
+
+
+
+    });
+</script>
+</body>
+</html>

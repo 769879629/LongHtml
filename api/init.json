@@ -19,7 +19,7 @@
       
         {
           "title": "代理商管理",
-          "href": "user_information.html",
+          "href": "",
           "icon": "fa fa-window-maximize",
           "target": "_self",
           "child": [
@@ -53,7 +53,7 @@
         
         {
           "title": "用户管理",
-          "href": "user_login.html",
+          "href": "",
           "icon": "fa fa-window-maximize",
           "target": "_self",
           "child": [
@@ -79,7 +79,7 @@
         },
         {
           "title": "购物管理",
-          "href": "goods_list.html",
+          "href": "",
           "icon": "fa fa-window-maximize",
           "target": "_self",
           "child": [
@@ -136,7 +136,7 @@
         },
         {
           "title": "电子银行",
-          "href": "account_detail.html",
+          "href": "",
           "icon": "fa fa-window-maximize",
           "target": "_self",
           "child": [
@@ -175,7 +175,7 @@
         },
         {
           "title": "咨讯管理",
-          "href": "welcome.html",
+          "href": "",
           "icon": "fa fa-window-maximize",
           "target": "_self",
           "child": [
@@ -202,7 +202,7 @@
         },
         {
           "title": "后台管理",
-          "href": "page/menu.html",
+          "href": "",
           "icon": "fa fa-window-maximize",
           "target": "_self",
           "child": [

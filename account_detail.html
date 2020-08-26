@@ -12,23 +12,7 @@
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
-
-
-
-        <!--<script type="text/html" id="toolbarDemo">-->
-            <!--<div class="layui-btn-container">-->
-                <!--<button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加 </button>-->
-                <!--<button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除 </button>-->
-            <!--</div>-->
-        <!--</script>-->
-
         <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
-
-        <!--<script type="text/html" id="currentTableBar">-->
-            <!--<a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>-->
-            <!--<a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-submit lay-filter="modify" lay-event="delete">删除</a>-->
-        <!--</script>-->
-
     </div>
 </div>
 <script src="lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
@@ -37,10 +21,25 @@
         var $ = layui.jquery,
             form = layui.form,
             table = layui.table;
+        var queryString = window.location.search.substring(1);
+        var id=""
+        $.ajax({
+            url: "http://localhost:8080/session.do",
+            type: "post",
+            dataType: "json",
+            async: false,
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(rec) {
+                id = rec.data.id;
+            }
+
+        })
 
         table.render({
             elem: '#currentTableId',
-            url: 'http://localhost:8080/acc/findlist.do',
+            url: 'http://localhost:8080/acc/findBymoneyIn.do?id='+id,
             toolbar: '#toolbarDemo',
             defaultToolbar: ['filter', 'exports', 'print', {
                 title: '提示',
@@ -49,19 +48,36 @@
             }], parseData:function(res){//res 即为原始返回的数据
                 console.log(res)
                 return {
-                    "code":0,
-                    "msg":"",
-                    "count":5,
-                    data:res
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data.list,
+                    "id": res.data.list.id
                 };
             },
             cols: [[
-                {field: 'id', width: 120, title: 'ID', sort: true},
-                {field: 'accountId', width: 150, title: '操作者ID', sort: true},
-                {field: 'accountDate', width: 180, title: '交易时间', sort: true},
-                {field: 'moneyIn', width: 150, title: '入账', sort: true},
-                {field: 'moneyOut', width: 150, title: '出帐'},
-                {field: 'type', width: 80, title: '类型',templet: function (item) {
+                {field: 'id',title: 'ID', sort: true},
+                {field: 'accountId', title: '操作者ID', sort: true,templet:function (rec) {
+                        var username='';
+                        $.ajax({
+                            url: "http://localhost:8080/user/findOne.do?id=" + rec.accountId,
+                            data: queryString,
+                            type: "post",
+                            async: false,
+                            xhrFields: {
+                                withCredentials: true
+                            },
+                            success: function (res) {
+                                username=res.data.username;
+                                return username
+                            }
+                        })
+                        return username;
+                    }},
+                {field: 'accountDate', title: '交易时间', sort: true},
+                {field: 'moneyIn', title: '入账', sort: true},
+                {field: 'moneyOut', title: '出帐'},
+                {field: 'type', title: '类型',templet: function (item) {
                         if (item.type == '0') {
                             return "充值";
                         } else if (item.type == '1') {
@@ -71,10 +87,10 @@
                         }else if (item.type == '3') {
                             return "收益";
                         }}},
-                {field: 'otherAccountId', width: 80, title: '交易方ID'},
+                {field: 'otherAccountId',title: '交易方ID'},
             ]],
-            limits: [10, 15, 20, 25, 50, 100],
-            limit: 15,
+            limits: [1, 5, 10, 15, 20, 30],
+            limit: 5,
             page: true,
             skin: 'line'
         });

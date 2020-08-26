@@ -9,141 +9,155 @@
     <link rel="stylesheet" href="lib/layui-v2.5.5/css/layui.css" media="all">
     <link rel="stylesheet" href="css/public.css" media="all">
     <style>
-        .layui-form-item .layui-input-company {width: auto;padding-right: 10px;line-height: 38px;}
+        .layui-form-item .layui-input-company {
+            width: auto;
+            padding-right: 10px;
+            line-height: 38px;
+        }
+
+        .width50 {
+            width: 200px
+        }
+
+        .dis {
+            display: inline-block
+        }
     </style>
 </head>
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
-
         <div class="layui-form layuimini-form">
+            <div style="display:inline-block">
                 <div class="layui-form-item">
                     <label class="layui-form-label required">昵称：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="username" lay-verify="required" lay-reqtext="管理账号不能为空" placeholder="请输入管理账号"  value="" class="layui-input">
+                        <input type="text" name="username" lay-verify="required" lay-reqtext="管理账号不能为空"
+                               placeholder="请输入管理账号" value="" class="layui-input width50">
                         <tip>填写自己管理账号的名称。</tip>
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label required">姓名：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="realName" lay-verify="required"   value="" class="layui-input">
+                        <input type="text" name="realName" lay-verify="required" value="" class="layui-input width50">
                         <tip>填写自己真实姓名</tip>
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label required">性别：</label>
-                    <div class="layui-input-block">
-                        <select id="sex" name="sex" value=""  >
-                            <option>男</option>
-                            <option>女</option>
-                        </select>
+                    <div class="layui-input-block  width50">
+                        <input type="text" name="sex" value="" class="layui-input width50">
                     </div>
                 </div>
-
                 <div class="layui-form-item">
                     <label class="layui-form-label required">生日：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="birthday" lay-verify="required"   value="" class="layui-input">
+                        <input type="text" name="birthday" lay-verify="required" value="" class="layui-input width50">
                     </div>
                 </div>
-
                 <div class="layui-form-item">
                     <label class="layui-form-label required">证件类型：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="cardTypeName" lay-verify="required"  value="" class="layui-input">
+                        <input type="text" name="cardTypeName" lay-verify="required" value=""
+                               class="layui-input width50">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label required">证件号码：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="idCard" lay-verify="required" value="" class="layui-input">
+                        <input type="text" name="idCard"   value="" class="layui-input width50">
                     </div>
                 </div>
                 <div class="layui-form-item">
-                    <label class="layui-form-label required">收货国家：</label>
+                    <label class="layui-form-label">收货国家：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="country" lay-verify="required"  value="" class="layui-input">
+                        <input type="text" name="country" value="" class="layui-input width50">
                     </div>
                 </div>
-
-
                 <div class="layui-form-item">
-                    <label class="layui-form-label required">手机</label>
+                    <label class="layui-form-label">手机：</label>
                     <div class="layui-input-block">
-                        <input type="number" name="mobile" lay-verify="required" lay-reqtext="手机不能为空" placeholder="请输入手机"   value="" class="layui-input">
+                        <input type="number" name="mobile"   lay-reqtext="手机不能为空" placeholder="请输入手机"
+                               value="" class="layui-input width50">
                     </div>
                 </div>
+            </div>
+            <div style="display: inline-block">
                 <div class="layui-form-item">
                     <label class="layui-form-label">邮箱</label>
                     <div class="layui-input-block">
-                        <input type="email" name="email"  placeholder="请输入邮箱"  value="" class="layui-input">
+                        <input type="email" name="email" placeholder="请输入邮箱"lay-verify="email" value="" class="layui-input width50">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label required">收货地址：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="userAddress" lay-verify="required"  value="" class="layui-input">
+                        <input type="text" name="userAddress" lay-verify="required" value=""
+                               class="layui-input width50">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label required">邮编：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="postCode" lay-verify="required"  value=" " class="layui-input">
+                        <input type="text" name="postCode" lay-verify="required" value=" " class="layui-input width50">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label required">注册时间：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="createTime" lay-verify="required"  value=" " class="layui-input">
+                        <input type="text" name="createTime" lay-verify="required" value=" "
+                               class="layui-input width50">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label required">推荐人名称：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="referCode" lay-verify="required"  value=" " class="layui-input">
+                        <input type="text" name="referId" lay-verify="required" value=" " class="layui-input width50">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label required">开户卡号：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="bankAccount" lay-verify="required"  value=" " class="layui-input">
+                        <input type="text" name="bankAccount" lay-verify="required" value=" "
+                               class="layui-input width50">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label required">开户行：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="bankName" lay-verify="required"  value=" " class="layui-input">
+                        <input type="text" name="bankName" lay-verify="required" value=" " class="layui-input width50">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label required">开户人：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="accountHolder" lay-verify="required"   value=" " class="layui-input">
+                        <input type="text" name="accountHolder" lay-verify="required" value=" "
+                               class="layui-input width50">
                     </div>
                 </div>
-
-
-                <div class="layui-form-item">
-                    <div class="layui-input-block">
-                        <button class="layui-btn" lay-submit  lay-filter="modify" id="modify" >修改信息</button>
-                    </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="modify" id="modify">修改信息</button>
                 </div>
+            </div>
         </div>
     </div>
 </div>
+
 
 <script src="lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
 <script src="js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 
 <script>
 
-    layui.use(['layer', 'form','jquery'], function () {
+    layui.use(['layer', 'form', 'jquery'], function () {
         var form = layui.form;
         var $ = layui.jquery;
         var layer = layui.layer;
-        var id="";
-
+        var id = "";
+        var queryString = window.location.search.substring(1);
         $.ajax({
             url: "http://localhost:8080/session.do",
             type: "post",
@@ -152,27 +166,31 @@
             xhrFields: {
                 withCredentials: true
             },
-            success: function(rec) {
+            success: function (rec) {
                 id = rec.data.id;
-                console.log("modifyid="+id);
             }
 
         })
 
 
-
         $.ajax({
-            url:"http://localhost:8080/user/findOne.do?id="+id,
-            type:"post",
+            url: "http://localhost:8080/user/findOne.do?id=" + id,
+            type: "post",
             async: false,
-            xhrFields:{
-                withCredentials:true
+            xhrFields: {
+                withCredentials: true
             },
-            success:function (rec) {
-
+            success: function (rec) {
+                rec=rec.data
                 $("input[name='username']").val(rec.username);
                 $("input[name='realName']").val(rec.realName);
-                $("input[name='sex']").val(rec.sex);
+                $("input[name='sex']").val(function (sex) {
+                    if (rec.sex=='男'){
+                        return "男";
+                    }else if (rec.sex=='女') {
+                        return "女";
+                    }
+                });
                 $("input[name='birthday']").val(rec.birthday);
                 $("input[name='cardTypeName']").val(rec.cardTypeName);
                 $("input[name='idCard']").val(rec.idCard);
@@ -182,7 +200,25 @@
                 $("input[name='userAddress']").val(rec.userAddress);
                 $("input[name='postCode']").val(rec.postCode);
                 $("input[name='createTime']").val(rec.createTime);
-                $("input[name='referCode']").val(rec.referCode);
+                $("input[name='referId']").val(function (res) {
+                    var username='';
+                        $.ajax({
+                            url: "http://localhost:8080/user/findOne.do?id="+rec.referId,
+                            data:queryString,
+                            type: "post",
+                            async: false,
+                            xhrFields: {
+                                withCredentials: true
+                            },
+                            success: function (res) {
+
+                                console.log("1111"+res)
+                                username=res.data.username;
+                                return   username;
+                            }
+                        });
+                    return   username;}
+                );
                 $("input[name='bankAccount']").val(rec.bankAccount);
                 $("input[name='bankName']").val(rec.bankName);
                 $("input[name='accountHolder']").val(rec.accountHolder);
@@ -190,9 +226,8 @@
         })
 
 
-
         form.on('submit(modify)', function () {
-                window.location = 'user_modify.html';
+            window.location = 'user_modify.html';
         });
 
     });

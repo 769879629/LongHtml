@@ -23,8 +23,7 @@
 
 
         <script type="text/html" id="toolbarDemo">
-            <div class="layui-btn-container">
-                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加 </button>
+            <div class="layui-btn-container" id="add">
              </div>
         </script>
 
@@ -44,7 +43,23 @@
         var $ = layui.jquery,
             form = layui.form,
             table = layui.table;
-           var queryString=window.location.search.substring(1);
+        var queryString=window.location.search.substring(1);
+
+        $.ajax({
+            url:"http://localhost:8080/session.do",
+            type: "post",
+            dataType: "json",
+            xhrFields: {
+                // 发送 AJAX 请求时带上 cookie
+                withCredentials: true
+            },
+            success:function (rec) {
+                if (rec.data.roleId==1){
+                    $("#add").html(" <button class=\"layui-btn layui-btn-normal layui-btn-sm data-add-btn\" lay-event=\"add\"> 添加 </button>")
+                }
+            }
+        })
+
 
         table.render({
             elem: '#currentTableId',
@@ -58,32 +73,32 @@
             parseData:function(res){//res 即为原始返回的数据
                 console.log(res)
                 return {
-                    "code":0,
-                    "msg":"",
-                    "count":5,
-                    data:res
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data.list,
+                    "id": res.data.list.id
                 };
             },
             cols: [[
-                {type: "checkbox", width: 50},
-                {field: 'id', width: 80, title: 'ID', sort: true},
-                {field: 'username', width: 100, title: '用户名'},
-                {field: 'realName', width: 100, title: '真实姓名'},
-                {field: 'sex', width: 80, title: '性别', sort: true},
-                {field: 'mobile', width: 80, title: '手机'},
-                {field: 'roleName', width: 120, title: '会员名称'},
-                {field: 'isStart', title: '是否启用',width: 120,templet: function (item) {
-                        if (item.isStart == '1') {
+                {type: "checkbox" },
+                {field: 'username' , title: '用户名'},
+                {field: 'realName' , title: '真实姓名'},
+                {field: 'sex' , title: '性别', sort: true},
+                {field: 'mobile',   title: '手机'},
+                {field: 'roleName' , title: '会员名称'},
+                {field: 'isStart', title: '是否启用' ,templet: function (item) {
+                        if (item.isStart == 1) {
                             return "已启用";
-                        } else if (item.isStart == '0') {
+                        } else if (item.isStart == 0) {
                             return "未启用";
                         }}
                 },
-                {field: 'createTime', title: '注册时间', width: 180, sort: true},
-                {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
+                {field: 'createTime', title: '注册时间' , sort: true},
+                {title: '操作' , toolbar: '#currentTableBar', align: "center"}
             ]],
-            limits: [10, 15, 20, 25, 50, 100],
-            limit: 15,
+            limits: [1, 5, 10, 15, 20, 30],
+            limit: 5,
             page: true,
             skin: 'line'
         });
@@ -98,29 +113,31 @@
                 , parseData:function(res){//res 即为原始返回的数据
                     console.log(res)
                     return {
-                        "code":0,
-                        "msg":"",
-                        "count":5,
-                        data:res};
-                },cols: [[
-                    {field: 'id', width: 80, title: 'ID', sort: true},
-                    {field: 'username', width: 100, title: '用户名'},
-                    {field: 'realName', width: 100, title: '真实姓名'},
-                    {field: 'sex', width: 80, title: '性别', sort: true},
-                    {field: 'mobile', width: 80, title: '手机'},
-                    {field: 'referCode', width: 120, title: '推荐人编号'},
-                    {field: 'isStart', title: '是否启用',width: 80,templet: function (item) {
+                        "code": res.code,
+                        "msg": res.msg,
+                        "count": res.count,
+                        "data": res.data.list,
+                        "id": res.data.list.id
+                    };
+                }, cols: [[
+                    {type: "checkbox" },
+                    {field: 'username' , title: '用户名'},
+                    {field: 'realName' , title: '真实姓名'},
+                    {field: 'sex' , title: '性别', sort: true},
+                    {field: 'mobile',   title: '手机'},
+                    {field: 'roleName' , title: '会员名称'},
+                    {field: 'isStart', title: '是否启用' ,templet: function (item) {
                             if (item.isStart == '1') {
                                 return "已启用";
-                            } else if (item.isStart == '2') {
+                            } else if (item.isStart == '0') {
                                 return "未启用";
                             }}
                     },
-                    {field: 'createTime', title: '注册时间', width: 180, sort: true},
-                    {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
+                    {field: 'createTime', title: '注册时间' , sort: true},
+                    {title: '操作' , toolbar: '#currentTableBar', align: "center"}
                 ]],
-                limits: [10, 15, 20, 25, 50, 100],
-                limit: 15,
+                limits: [1, 5, 10, 15, 20, 30],
+                limit: 5,
                 page: true,
                 skin: 'line'
             })
@@ -176,7 +193,6 @@
             } else if (obj.event === 'delete') {
 
                 form.on('submit(modify)', function () {
-
                     $.ajax({
                         url:"http://localhost:8080/user/remove.do?id="+data.id,
                         type:"post",

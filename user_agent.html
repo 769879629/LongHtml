@@ -22,12 +22,12 @@
         </div>
 
 
-
         <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
 
         <script type="text/html" id="currentTableBar">
             <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
-            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-submit lay-filter="modify" lay-event="delete">锁定</a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-submit lay-filter="modify"
+               lay-event="delete">锁定</a>
         </script>
 
     </div>
@@ -38,87 +38,110 @@
         var $ = layui.jquery,
             form = layui.form,
             table = layui.table;
-        var queryString=window.location.search.substring(1);
-        var search="";
+        var queryString = window.location.search.substring(1);
+        var search = "";
+        var id="";
 
+
+
+        $.ajax({
+            url: "http://localhost:8080/session.do",
+            data: queryString,
+            type: "post",
+            dataType: "json",
+            async: false,
+            xhrFields: {
+                // 发送 AJAX 请求时带上 cookie
+                withCredentials: true
+            },
+            success: function(rec) {
+                 id=rec.data.id;
+            }
+        })
 
         table.render({
             elem: '#currentTableId',
-            url: 'http://localhost:8080/user/findoffical.do',
+            url: 'http://localhost:8080/user/findOfficialbyRid.do?referId='+id,
             toolbar: '#toolbarDemo',
             defaultToolbar: ['filter', 'exports', 'print', {
                 title: '提示',
                 layEvent: 'LAYTABLE_TIPS',
                 icon: 'layui-icon-tips'
             }],
-            parseData:function(res){//res 即为原始返回的数据
-            console.log(res)
-            return {
-                "code":0,
-                "msg":"",
-                "count":5,
-                data:res
-            };
-        },
+            parseData: function (res) {//res 即为原始返回的数据
+                console.log(res)
+                return {
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data.list,
+                    "id": res.data.list.id,
+                };
+            },
             cols: [[
-                {field: 'id', width: 80, title: 'ID', sort: true},
-                {field: 'username', width: 100, title: '用户名'},
-                {field: 'realName', width: 100, title: '真实姓名'},
-                {field: 'sex', width: 80, title: '性别', sort: true},
-                {field: 'mobile', width: 120, title: '手机'},
-                {field: 'isStart', title: '是否启用',width: 80,templet: function (item) {
-                        if (item.isStart == '1') {
+                {field: 'username', title: '用户名'},
+                {field: 'realName', title: '真实姓名'},
+                {field: 'sex', title: '性别', sort: true},
+                {field: 'roleName', title: '会员等级', sort: true},
+                {field: 'mobile', title: '手机'},
+                {
+                    field: 'isStart', title: '是否启用',templet: function (item) {
+                        if (item.isStart == 1) {
                             return "已启用";
-                        } else if (item.isStart == '2') {
+                        } else if (item.isStart == 0) {
                             return "未启用";
-                        }}
- },
-                {field: 'createTime', title: '注册时间', width: 180, sort: true},
-                {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
+                        }
+                    }
+                },
+                {field: 'createTime', title: '注册时间', sort: true},
+                {title: '操作', toolbar: '#currentTableBar', align: "center"}
             ]],
-            limits: [10, 15, 20, 25, 50, 100],
-            limit: 15,
+            limits: [1, 5, 10, 15, 20, 30],
+            limit: 5,
             page: true,
             skin: 'line',
         });
 
         // 搜索
-        $('.demoTable .layui-btn').on('click', function(){
+        $('.demoTable .layui-btn').on('click', function () {
 
             search = $("input[name='username']").val();
             table.render({
-                elem:'#currentTableId'
-                ,url:'http://localhost:8080/user/findusername.do?username='+search
-                , parseData:function(res){//res 即为原始返回的数据
+                elem: '#currentTableId'
+                , url: 'http://localhost:8080/user/findOfficialbyRidAndUn.do?username='+search+'&referId='+id
+                , parseData: function (res) {//res 即为原始返回的数据
                     console.log(res)
                     return {
-                        "code":0,
-                        "msg":"",
-                        "count":5,
-                        data:res};
-                },cols: [[
-                    {field: 'id', width: 80, title: 'ID', sort: true},
-                    {field: 'username', width: 100, title: '用户名'},
-                    {field: 'realName', width: 100, title: '真实姓名'},
-                    {field: 'sex', width: 80, title: '性别', sort: true},
-                    {field: 'mobile', width: 80, title: '手机'},
-                    {field: 'isStart', title: '是否启用',width: 80,templet: function (item) {
-                            if (item.isStart == '1') {
+                        "code": res.code,
+                        "msg": res.msg,
+                        "count": res.count,
+                        "data": res.data.list,
+                        "id": res.data.list.id,
+                    };
+                },    cols: [[
+                    {field: 'username', title: '用户名'},
+                    {field: 'realName', title: '真实姓名'},
+                    {field: 'sex', title: '性别', sort: true},
+                    {field: 'roleName', title: '会员等级', sort: true},
+                    {field: 'mobile', title: '手机'},
+                    {
+                        field: 'isStart', title: '是否启用',templet: function (item) {
+                            if (item.isStart == 1) {
                                 return "已启用";
-                            } else if (item.isStart == '2') {
+                            } else if (item.isStart == 0) {
                                 return "未启用";
-                            }}
+                            }
+                        }
                     },
-                    {field: 'createTime', title: '注册时间', width: 180, sort: true},
-                    {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
+                    {field: 'createTime', title: '注册时间', sort: true},
+                    {title: '操作', toolbar: '#currentTableBar', align: "center"}
                 ]],
-                limits: [10, 15, 20, 25, 50, 100],
-                limit: 15,
+                limits: [1, 5, 10, 15, 20, 30],
+                limit: 5,
                 page: true,
                 skin: 'line'
             })
         })
-
 
 
         /**
@@ -130,7 +153,7 @@
                     title: '添加用户',
                     type: 2,
                     shade: 0.2,
-                    maxmin:true,
+                    maxmin: true,
                     shadeClose: true,
                     area: ['100%', '100%'],
                     content: 'user_add.html',
@@ -152,17 +175,17 @@
 
         table.on('tool(currentTableFilter)', function (obj) {
             var data = obj.data;
-            console.log("data="+data.id)
+            console.log("data=" + data.id)
             if (obj.event === 'edit') {
 
                 var index = layer.open({
                     title: '编辑用户',
                     type: 2,
                     shade: 0.2,
-                    maxmin:true,
+                    maxmin: true,
                     shadeClose: true,
                     area: ['100%', '100%'],
-                    content: 'user_edit.html?id='+data.id,
+                    content: 'user_edit.html?id=' + data.id,
                 });
                 $(window).on("resize", function () {
                     layer.full(index);
@@ -170,19 +193,19 @@
                 return false;
             } else if (obj.event === 'delete') {
 
-                form.on('submit(modify)', function (){
+                form.on('submit(modify)', function () {
                     $.ajax({
-                        url:"http://localhost:8080/user/modifyisStart.do?id="+data.id,
-                        type:"post",
-                        dataType:"json",
+                        url: "http://localhost:8080/user/modifyisStart.do?id=" + data.id,
+                        type: "post",
+                        dataType: "json",
                         async: false,
-                        xhrFields:{
-                            withCredentials:true
+                        xhrFields: {
+                            withCredentials: true
                         },
-                        success:function (rec) {
+                        success: function (rec) {
 
                             layer.msg(rec.msg);
-                            layui.use('layer', function(){
+                            layui.use('layer', function () {
                                 var layer = layui.layer;
                                 layer.alert("用户锁定成功！",
                                     function () {

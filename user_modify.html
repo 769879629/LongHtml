@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:c="http://java.sun.com/jsp/jstl/core">
 <head>
     <meta charset="utf-8">
     <title>基本资料</title>
@@ -14,138 +14,140 @@
 </head>
 <body>
 <div class="layuimini-container">
-    <div class="layuimini-main">
-
+    <div class="layuimini-main layui-form-item">
         <div class="layui-form layuimini-form">
-            <form class="layui-form" action="">
-            <div class="layui-form-item">
-                <label class="layui-form-label required">昵称：</label>
-                <div class="layui-input-block">
-                    <input type="text" name="username" lay-verify="required" lay-reqtext="管理账号不能为空" placeholder="请输入管理账号"  value="" class="layui-input">
-                    <tip>填写自己管理账号的名称。</tip>
+            <div style="display:inline-block">
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">昵称：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="username" lay-verify="required" lay-reqtext="管理账号不能为空"
+                               placeholder="请输入管理账号" value="" class="layui-input width50">
+                        <tip>填写自己管理账号的名称。</tip>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">姓名：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="realName" lay-verify="required" value="" class="layui-input width50">
+                        <tip>填写自己真实姓名</tip>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">性别：</label>
+                    <div class="layui-input-block  width50">
+                        <select id="sex" name="sex" class="layui-input-block"  >
+                            <option value=" ">请选择</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">生日：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="birthday" lay-verify="required" value="" class="layui-input width50">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">证件类型：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="cardTypeName" lay-verify="required" value=""
+                               class="layui-input width50">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">证件号码：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="idCard" lay-verify="identity" value="" class="layui-input width50">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">收货国家：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="country" value="" class="layui-input width50">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">手机：</label>
+                    <div class="layui-input-block">
+                        <input type="number" name="mobile" lay-verify="phone" lay-reqtext="手机不能为空" placeholder="请输入手机"
+                               value="" class="layui-input width50">
+                    </div>
+                </div>
+            </div>
+            <div style="display: inline-block">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">邮箱</label>
+                    <div class="layui-input-block">
+                        <input type="email" name="email" placeholder="请输入邮箱"lay-verify="email" value="" class="layui-input width50">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">收货地址：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="userAddress" lay-verify="required" value=""
+                               class="layui-input width50">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">邮编：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="postCode" lay-verify="required" value=" " class="layui-input width50">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">注册时间：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="createTime" lay-verify="required" value=" "
+                               class="layui-input width50">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">推荐人名称：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="sss" lay-verify="required" value=" " readonly="readonly" class="layui-input width50">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">开户卡号：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="bankAccount" lay-verify="required" value=" "
+                               class="layui-input width50">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">开户行：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="bankName" lay-verify="required" value=" " class="layui-input width50">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">开户人：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="accountHolder" lay-verify="required" value=" "
+                               class="layui-input width50">
+                    </div>
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label required">姓名：</label>
                 <div class="layui-input-block">
-                    <input type="text" name="realName" lay-verify="required"   value="" class="layui-input">
-                    <tip>填写自己真实姓名</tip>
+                    <button class="layui-btn" lay-submit lay-filter="modify" id="modify">修改信息</button>
                 </div>
             </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label required">性别：</label>
-                <div class="layui-input-block">
-                    <select id="sex" name="sex" value=""  >
-                        <option>男</option>
-                        <option>女</option>
-                    </select>                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label required">生日：</label>
-                <div class="layui-input-block">
-                    <input type="text" name="birthday" lay-verify="required"   value="" class="layui-input">
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label required">证件类型：</label>
-                <div class="layui-input-block">
-                    <input type="text" name="cardTypeName" lay-verify="required"   value="" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label required">证件号码：</label>
-                <div class="layui-input-block">
-                    <input type="text" name="idCard" lay-verify="required"   value="" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label required">收货国家：</label>
-                <div class="layui-input-block">
-                    <input type="text" name="country" lay-verify="required"   value="" class="layui-input">
-                </div>
-            </div>
-
-
-            <div class="layui-form-item">
-                <label class="layui-form-label required">手机</label>
-                <div class="layui-input-block">
-                    <input type="number" name="mobile" lay-verify="required" lay-reqtext="手机不能为空" placeholder="请输入手机"  value="" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">邮箱</label>
-                <div class="layui-input-block">
-                    <input type="email" name="email"  placeholder="请输入邮箱"  value="" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label required">收货地址：</label>
-                <div class="layui-input-block">
-                    <input type="text" name="userAddress" lay-verify="required"   value="" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label required">邮编：</label>
-                <div class="layui-input-block">
-                    <input type="text" name="postCode" lay-verify="required"   value=" " class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label required">注册时间：</label>
-                <div class="layui-input-block">
-                    <input type="text" name="createTime" lay-verify="required"   value=" " class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label required">推荐人名称：</label>
-                <div class="layui-input-block">
-                    <input type="text" name="referCode" lay-verify="required"   value=" " class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label required">开户卡号：</label>
-                <div class="layui-input-block">
-                    <input type="text" name="bankAccount" lay-verify="required"   value=" " class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label required">开户行：</label>
-                <div class="layui-input-block">
-                    <input type="text" name="bankName" lay-verify="required"   value=" " class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label required">开户人：</label>
-                <div class="layui-input-block">
-                    <input type="text" name="accountHolder" lay-verify="required"   value=" " class="layui-input">
-                </div>
-            </div>
-
-
-            <div class="layui-form-item">
-                <div class="layui-input-block">
-                    <button class="layui-btn" lay-submit  lay-filter="modify">立即提交</button>
-                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-                </div>
-            </div>
-            </form>
         </div>
     </div>
 </div>
 
 <script src="lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
-<script src="js/lay-config.js?v=1.0.4" charset="utf-8"></script>
+<script src="lib/jquery-3.4.1/jquery-3.3.1.js" charset="utf-8"></script>
 
 <script>
 
     layui.use(['layer', 'form','jquery'], function () {
         var form = layui.form;
-        var $ = layui.jquery;
+        var $ = layui.$;
         var layer = layui.layer;
         var id="";
-
+        var queryString = window.location.search.substring(1);
+        var sex;
         $.ajax({
             url: "http://localhost:8080/session.do",
             type: "post",
@@ -165,16 +167,16 @@
 
         $.ajax({
             url:"http://localhost:8080/user/findOne.do?id="+id,
+            data: queryString,
             type:"post",
             async: false,
             xhrFields:{
                 withCredentials:true
             },
             success:function (rec) {
-
+rec=rec.data
                 $("input[name='username']").val(rec.username);
                 $("input[name='realName']").val(rec.realName);
-                $("input[name='sex']").val(rec.sex);
                 $("input[name='birthday']").val(rec.birthday);
                 $("input[name='cardTypeName']").val(rec.cardTypeName);
                 $("input[name='idCard']").val(rec.idCard);
@@ -184,16 +186,42 @@
                 $("input[name='userAddress']").val(rec.userAddress);
                 $("input[name='postCode']").val(rec.postCode);
                 $("input[name='createTime']").val(rec.createTime);
-                $("input[name='referCode']").val(rec.referCode);
+                $("input[name='sss']").val(function (res) {
+                    var username='';
+                    $.ajax({
+                        url: "http://localhost:8080/user/findOne.do?id="+rec.referId,
+                        data:queryString,
+                        type: "post",
+                        async: false,
+                        xhrFields: {
+                            withCredentials: true
+                        },
+                        success: function (res) {
+                            console.log("1111"+res)
+                            username=res.data.username;
+                            return   username;
+                        }
+                    });
+                    return   username;}
+                );
                 $("input[name='bankAccount']").val(rec.bankAccount);
                 $("input[name='bankName']").val(rec.bankName);
                 $("input[name='accountHolder']").val(rec.accountHolder);
+
+                sex = rec.sex;
+                if (sex=='男'){
+                    $("#sex").append("<option selected value='男'>男</option><option   value='女'>女</option>");
+                    form.render();
+                }
+                else{
+                    $("#sex").append("<option  value='男'>男</option><option  selected value='女'>女</option>");
+                    form.render();
+                }
             }
         })
 
         form.on('submit(modify)', function (data) {
             data = data.field;
-            console.log('aaa'+data)
             $.ajax({
                 url:"http://localhost:8080/user/modify.do?id="+id,
                 type:"post",
@@ -206,13 +234,15 @@
                 success:function (rec) {
                     layer.msg(rec.msg);
                     layui.use('layer', function(){
-                        var layer = layui.layer;
-                        layer.alert("用户修改成功！",
-                            function () {
-                                window.parent.location.reload();//刷新父页面
-                                parent.layer.close(index);//关闭当前的弹窗
-                            }
-                        );
+                        if (rec.code==0){
+                            layer.alert(rec.msg,
+                                function () {
+                                    window.parent.location.reload();//刷新父页面
+                                }
+                            );
+                        } else {
+                            layer.msg(rec.msg);
+                        }
                     });
 
                 }

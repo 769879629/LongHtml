@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="css/public.css" media="all">
     <style>
         .layui-form-item .layui-input-company {width: auto;padding-right: 10px;line-height: 38px;}
+        .width50{width: 150px}
     </style>
 </head>
 <body>
@@ -21,38 +22,51 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label required">昵称：</label>
                     <div class="layui-input-block">
-                        <input type="text" name="username" lay-verify="required" lay-reqtext="管理账号不能为空" placeholder="请输入管理账号"  value="" class="layui-input">
-                        <tip>填写自己管理账号的名称。</tip>
+                        <input type="text" name="username"  lay-verify="required" lay-reqtext="管理账号不能为空" placeholder="请输入管理账号"  value="" class="layui-input width50">
+                        <tip>登录账号。</tip>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">真实姓名：</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="realName"  lay-verify="required" lay-reqtext="真实姓名不能为空" placeholder="请输入真实姓名"  value="" class="layui-input width50">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label required">一级密码：</label>
                     <div class="layui-input-block">
-                        <input type="password" name="password" lay-verify="required"   value="" class="layui-input">
+                        <input type="password" name="password" lay-verify="password"   value="" class="layui-input width50">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label required">二级密码：</label>
                     <div class="layui-input-block">
-                        <input type="password" name="password2" lay-verify="required"   value="" class="layui-input">
+                        <input type="password" name="password2" lay-verify="password"   value="" class="layui-input width50">
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label required">性别：</label>
-                    <div class="layui-input-block">
-                        <select id="sex" name="sex" value=""  >
-                            <option  >男</option>
-                            <option  >女</option>
+                    <div class="layui-input-block  width50">
+                        <select id="sex" name="sex" value="">
+                            <option  value="男">男</option>
+                            <option  value="女">女</option>
                         </select>
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label required">手机</label>
                     <div class="layui-input-block">
-                        <input type="number" name="mobile" lay-verify="required" lay-reqtext="手机不能为空" placeholder="请输入手机"  value="" class="layui-input">
+                        <input type="number" name="mobile" lay-verify="phone" lay-reqtext="手机不能为空" placeholder="请输入手机"  value="" class="layui-input  width50">
                     </div>
                 </div>
-
+                <div class="layui-form-item">
+                    <label class="layui-form-label required">上级代理：</label>
+                    <div class="layui-input-block  width50">
+                        <select id="referId" name="referId" value="">
+                            <option value=" ">请选择</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="layui-form-item">
                     <div class="layui-input-block">
                         <button class="layui-btn" lay-submit  lay-filter="modify">立即提交</button>
@@ -65,6 +79,7 @@
 </div>
 
 <script src="lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="lib/layui-v2.5.5/layui.all.js" charset="utf-8"></script>
 <script src="js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 
 <script>
@@ -73,12 +88,51 @@
         var form = layui.form;
         var $ = layui.jquery;
         var layer = layui.layer;
+        var queryString = window.location.search.substring(1);
         var id="";
 
 
+        $.ajax({
+            url: "http://localhost:8080/session.do",
+            data: queryString,
+            type: "post",
+            dataType: "json",
+            async: false,
+            xhrFields: {
+                // 发送 AJAX 请求时带上 cookie
+                withCredentials: true
+            },
+            success: function(rec) {
+                id=rec.data.id;
+            }
+        })
+
+
+        $.ajax({
+            url:"http://localhost:8080/user/findOfficialbyRid.do?referId="+id+"&page=1&limit=20",
+            type: "post",
+            dataType: "json",
+            async: false,
+            xhrFields:{
+                withCredentials:true
+            },
+            page:false,
+            success:function (res) {
+                console.log("++++"+res.data)
+                    for(var i =0;i<res.data.list.length;i++){
+                        $("#referId").append("<option value=\""+res.data.list[i].id+"\">"+res.data.list[i].username+"</option>");
+                    }
+                    form.render();
+            }
+        })
+
         form.on('submit(modify)', function (data) {
             data = data.field;
-            console.log(data)
+            if (data.password!=data.password2){
+                alert("两次密码不一致，请重新输入！")
+                return false;
+            }
+
             $.ajax({
                 url:"http://localhost:8080/user/addone.do",
                 type:"post",
@@ -89,7 +143,7 @@
                     withCredentials:true
                 },
                 success:function (rec) {
-
+                    if (rec.code==0) {
                     layer.msg(rec.msg);
                     layui.use('layer', function(){
                         var layer = layui.layer;
@@ -100,7 +154,9 @@
                             }
                         );
                     });
+                    }else {
 
+                    }
                 }
             })
 

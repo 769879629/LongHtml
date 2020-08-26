@@ -158,7 +158,7 @@
 					},
 					success: function(rec) {
 						//当前用户不存在
-						if(rec.code != 0) {
+						if(rec.code == 1) {
 							layer.alert(rec.msg, function(index) {
 								window.location = "login.html";
 								layer.close(index);
@@ -194,9 +194,25 @@
 				});
 
 				$('.login-out').on("click", function() {
-					layer.msg('退出登录成功', function() {
-						window.location = 'login.html';
-					});
+
+                    $.ajax({
+                        url: "http://localhost:8080/logout.do",
+                        type: "post",
+                        dataType: "json",
+                        xhrFields: {
+                            // 发送 AJAX 请求时带上 cookie
+                            withCredentials: true
+                        },
+                        success: function(rec) {
+                            if (rec.code==0){
+                                layer.msg(rec.msg, function() {
+                                    window.location = 'login.html';
+                                });
+                            } else {
+                                layer.msg(rec.msg);
+							}
+                        }
+                    })
 				});
 			});
 		</script>

@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="lib/layui-v2.5.5/css/layui.css" media="all">
     <link rel="stylesheet" href="css/public.css" media="all">
     <link rel="stylesheet" href="js/lay-module/step-lay/step.css" media="all">
+    <style>
+        .width50{width: 250px}
+    </style>
 </head>
 <body>
 
@@ -20,17 +23,18 @@
             <div class="layui-form-item">
                 <label class="layui-form-label required">提现金额:：</label>
                 <div class="layui-input-block">
-                    <input type="number" name="moneyOut" lay-verify="required"   value="" class="layui-input">
-                    <tip>每日限额50000</tip>
+                    <input type="text" name="moneyOut" lay-verify="required"   value="" class="layui-input width50">
                 </div>
             </div>
 
             <div class="layui-form-item">
                 <label class="layui-form-label required">提现账户：</label>
                 <div class="layui-input-block">
-                    <input type="number" name="otherAccountId" lay-verify="required"    value="" class="layui-input">
+                    <input type="text" name="otherAccountId"  readonly="readonly" value="" class="layui-input  width50">
                 </div>
             </div>
+
+
             <div class="layui-form-item">
                 <div class="layui-input-block">
                     <button class="layui-btn" lay-submit  lay-filter="modify" id="modify" >确认提现</button>
@@ -40,13 +44,15 @@
     </div>
 </div>
 <script src="lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
 <script src="js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 <script>
     layui.use([ 'form', 'step'], function () {
         var $ = layui.$,
             form = layui.form,
             step = layui.step;
-
+        var id="";
+        var password="";
         $.ajax({
             url: "http://localhost:8080/session.do",
             type: "post",
@@ -61,35 +67,63 @@
 
         })
 
+        $.ajax({
+            url: "http://localhost:8080/user/findOne.do?id="+id,
+            type: "post",
+            async: false,
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function (rec) {
+                console.log("+++"+rec.data)
+                $("input[name='otherAccountId']").val(rec.data.bankAccount);
+                password = rec.data.password;
+            }
+        })
+
         form.on('submit(modify)', function (data) {
             data = data.field;
             console.log(data)
-            $.ajax({
-                url:"http://localhost:8080/acc/insertdout.do?accountId="+id,
-                type:"post",
-                data:data,
-                dataType:"json",
-                async: false,
-                xhrFields:{
-                    withCredentials:true
-                },
-                success:function (rec) {
+            layer.open({
+                title: "输入密码",
+                content: '输入密码：<input type="password" id="password" name="password">'
+                ,btn: '确认充值'
+                ,yes:function () {
+                    var password1 = $("#password").val();
+                    if (password==password1){
 
-                    layer.msg(rec.msg);
-                    layui.use('layer', function(){
-                        var layer = layui.layer;
-                        layer.alert("提现成功！",
-                            function () {
-                                window.parent.location.reload();//刷新父页面
-                                parent.layer.close(index);//关闭当前的弹窗
+                        $.ajax({
+                            url:"http://localhost:8080/acc/insertdout.do?accountId="+id,
+                            type:"post",
+                            data:data,
+                            dataType:"json",
+                            async: false,
+                            xhrFields:{
+                                withCredentials:true
+                            },
+                            success:function (rec) {
+                                if (rec.code==0) {
+                                    layer.msg(rec.msg, function () {
+                                        window.location.reload()
+                                    }); }else{
+                                    //认证不成功
+                                    layer.msg(rec.msg);
+                                }
                             }
-                        );
-                    });
-
+                        })
+                        return false;
+                    }
+                    if (password!=password1){
+                        layer.msg('密码不正确！');
+                        return false;
+                    }
+                    return false;
                 }
+
             })
 
-            return false;
+
+
         });
 
     })

@@ -14,19 +14,16 @@
     <div class="layuimini-main">
 
 
-
         <script type="text/html" id="toolbarDemo">
             <div class="layui-btn-container">
-                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加 </button>
-                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除 </button>
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加</button>
             </div>
         </script>
 
-        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+            <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
 
         <script type="text/html" id="currentTableBar">
             <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">查看</a>
-            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-submit lay-filter="modify" lay-event="delete">回复</a>
         </script>
 
     </div>
@@ -37,7 +34,25 @@
         var $ = layui.jquery,
             form = layui.form,
             table = layui.table;
+        var queryString = window.location.search.substring(1);
 
+        $.ajax({
+            url: "http://localhost:8080/session.do",
+            type: "post",
+            dataType: "json",
+            async: false,
+            xhrFields: {
+                // 发送 AJAX 请求时带上 cookie
+                withCredentials: true
+            },
+            success: function (rec) {
+                var roleName = rec.data.roleName;
+                if (roleName == "管理员") {
+
+                    $("#currentTableBar").append("<a class=\"layui-btn layui-btn-xs layui-btn-danger data-count-edit\" lay-submit lay-filter=\"modify\" lay-event=\"rply\">回复</a>\n" + "<a class=\"layui-btn layui-btn-normal layui-btn-xs data-count-delete\" lay-event=\"delete\">删除</a>")
+                }
+            }
+        })
 
         table.render({
             elem: '#currentTableId',
@@ -48,36 +63,39 @@
                 layEvent: 'LAYTABLE_TIPS',
                 icon: 'layui-icon-tips'
             }],
-            parseData:function(res){//res 即为原始返回的数据
+            parseData: function (res) {//res 即为原始返回的数据
                 console.log(res)
                 return {
-                    "code":0,
-                    "msg":"",
-                    "count":5,
-                    data:res
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data.list,
+                    "id": res.data.list.id
                 };
             },
             cols: [[
-                {type: "checkbox", width: 50},
-                {field: 'id', width: 80, title: 'ID', sort: true},
-                {field: 'createdBy', width: 80, title: '留言用户姓名', sort: true},
-                {field: 'messageTitle', width: 100, title: '留言标题'},
-                {field: 'messageContent', width: 100, title: '留言内容'},
-                {field: 'state', width: 80, title: '状态',templet: function (item) {
-                        if (item.state == '1') {
-                            return "已查看";
-                        } else if (item.state == '0') {
-                            return "未查看";
-                        }}},
-                {field: 'createTime', width: 120, title: '留言时间'},
-                {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
+                {type: "checkbox"},
+                {field: 'id', title: 'ID', sort: true},
+                {field: 'createdBy', title: '留言用户姓名'},
+                {field: 'messageTitle', title: '留言标题'},
+                {field: 'messageContent', title: '留言内容'},
+                {
+                    field: 'state', title: '状态', templet: function (item) {
+                        if (item.state == 1) {
+                            return "已回复"
+                        } else {
+                            return "未回复"
+                        }
+                    }
+                },
+                {field: 'createTime', title: '留言时间', sort: true},
+                {title: '操作', toolbar: '#currentTableBar', align: "center"}
             ]],
-            limits: [10, 15, 20, 25, 50, 100],
-            limit: 15,
+            limits: [1, 5, 10, 15, 20, 30],
+            limit: 5,
             page: true,
             skin: 'line'
         });
-
 
 
         /**
@@ -89,7 +107,7 @@
                     title: '添加留言',
                     type: 2,
                     shade: 0.2,
-                    maxmin:true,
+                    maxmin: true,
                     shadeClose: true,
                     area: ['100%', '100%'],
                     content: 'leave_add.html',
@@ -97,45 +115,58 @@
                 $(window).on("resize", function () {
                     layer.full(index);
                 });
-            } else if (obj.event === 'delete') {  // 监听删除操作
-                var checkStatus = table.checkStatus('currentTableId')
-                    , data = checkStatus.data;
-                layer.alert(JSON.stringify(data));
             }
         });
 
-        //监听表格复选框选择
-        table.on('checkbox(currentTableFilter)', function (obj) {
-            console.log(obj)
-        });
+
 
         table.on('tool(currentTableFilter)', function (obj) {
             var data = obj.data;
-            console.log("data="+data.id)
             if (obj.event === 'edit') {
-
                 var index = layer.open({
-                    title: '编辑用户',
+                    title: '回复',
                     type: 2,
                     shade: 0.2,
-                    maxmin:true,
+                    maxmin: true,
                     shadeClose: true,
                     area: ['100%', '100%'],
-                    content: 'leave_one.html?id='+data.id,
+                    content: 'leave_one.html?id=' + data.id,
                 });
                 $(window).on("resize", function () {
                     layer.full(index);
                 });
                 return false;
             } else if (obj.event === 'delete') {
+                $.ajax({
+                    url:"http://localhost:8080/mess/delete.do?id=" +data.id,
+                    type:"post",
+                    data:data,
+                    dataType:"json",
+                    async: false,
+                    xhrFields:{
+                        withCredentials:true
+                    },
+                    success:function (rec) {
+                            if (rec.code == 0) {
+                                alert(rec.msg)
+                                window.parent.location.reload();
+                                parent.layer.close(index);
+                            }else {
+                                alert(rec.msg)
+                            }
+                    }
+                })
+
+                return false;
+            }else if (obj.event === 'rply'){
                 var index = layer.open({
                     title: '回复',
                     type: 2,
                     shade: 0.2,
-                    maxmin:true,
+                    maxmin: true,
                     shadeClose: true,
                     area: ['100%', '100%'],
-                    content: 'leave_reply.html?id='+data.id,
+                    content: 'leave_reply.html?id=' + data.id,
                 });
                 $(window).on("resize", function () {
                     layer.full(index);

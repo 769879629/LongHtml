@@ -20,23 +20,32 @@
 <body>
 <div class="layui-form layuimini-form">
     <div class="layui-form-item">
-        <label class="layui-form-label required">标题</label>
+        <label class="layui-form-label required">角色编码</label>
         <div class="layui-input-block">
-            <input type="text" name="messageTitle" lay-verify="required"  placeholder="请输入标题" value="" class="layui-input width50">
+            <input type="text" name="roleCode" lay-verify="required" lay-reqtext="不能为空" placeholder="请输入编码" value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label required">内容</label>
+        <label class="layui-form-label required">角色名称</label>
         <div class="layui-input-block">
-            <input type="text" name="messageContent" lay-verify="required" placeholder="请输入内容" value="" class="layui-input width50">
+            <input type="text" name="roleName" lay-verify="required" lay-reqtext="不能为空" placeholder="请输入名称" value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">留言人</label>
-        <div class="layui-input-block">
-            <input type="email" name="createdBy" readonly="readonly" class="layui-input width50">
+        <label class="layui-form-label required">是否启用</label>
+        <div class="layui-input-block width50">
+            <input type="radio" name="isStart" value="1" title="启用" checked="">
+            <input type="radio" name="isStart" value="0" title="不启用">
         </div>
     </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label required">创建人</label>
+        <div class="layui-input-block">
+            <input type="text" name="createBy" id="createdBy" value="" readonly="readonly" class="layui-input width50">
+        </div>
+    </div>
+
     <div class="layui-form-item">
         <div class="layui-input-block">
             <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
@@ -49,7 +58,6 @@
         var form = layui.form,
             layer = layui.layer,
             $ = layui.$;
-
 
 
         $.ajax({
@@ -74,15 +82,16 @@
                 withCredentials:true
             },
             success:function (rec) {
-                $("input[name='createdBy']").val(rec.data.username);
+                $("input[name='createBy']").val(rec.data.username);
             }
         })
+
         //监听提交
         form.on('submit(saveBtn)', function (data) {
             data = data.field;
             console.log(data)
             $.ajax({
-                url:"http://localhost:8080/mess/add.do",
+                url:"http://localhost:8080/role/add.do",
                 type:"post",
                 data:data,
                 dataType:"json",
@@ -91,12 +100,16 @@
                     withCredentials:true
                 },
                 success:function (rec) {
-                    if (rec.code == 0) {
-                        alert(rec.msg)
-                        window.parent.location.reload();
-                    }else {
-                        alert(rec.msg)
-                    }
+
+                        if (rec.code==0) {
+                            layer.msg(rec.msg, function () {
+                                window.location.reload()
+                            }); }else {
+                            //认证不成功
+                            layer.msg(rec.msg);
+
+                        }
+
                 }
             })
 

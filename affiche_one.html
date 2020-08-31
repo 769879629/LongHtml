@@ -12,6 +12,14 @@
         body {
             background-color: #ffffff;
         }
+
+        .width50{
+            width: 200px;
+        }
+        .width10{
+            width: 200px;
+            height: 200px;
+        }
     </style>
 </head>
 <body>
@@ -19,33 +27,31 @@
     <div class="layui-form-item">
         <label class="layui-form-label required">标题</label>
         <div class="layui-input-block">
-            <input type="text" name="title" lay-verify="required" lay-reqtext="不能为空" readonly="readonly" placeholder="请输入编码" value="" class="layui-input">
+            <input type="text" name="title" lay-verify="required"   readonly="readonly"  value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">内容</label>
         <div class="layui-input-block">
-            <input type="text" name="content" lay-verify="required" lay-reqtext="不能为空" readonly="readonly" placeholder="请输入名称" value="" class="layui-input">
-
+            <textarea type="text" name="content" readonly="readonly" class="layui-input  width10"></textarea>
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">发布人</label>
         <div class="layui-input-block">
-            <input type="text"  name="publisher" lay-verify="required" readonly="readonly" value="" class="layui-input">
+            <input type="text"  name="publisher" readonly="readonly" value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">生效时间</label>
         <div class="layui-input-block">
-            <input type="text" id="test5" name="startTime" readonly="readonly" placeholder="yyyy-MM-dd HH:mm:ss" value="" class="layui-input">
+            <input type="text" id="test5" name="startTime" readonly="readonly" placeholder="yyyy-MM-dd HH:mm:ss" value="" class="layui-input width50">
         </div>
     </div>
-
     <div class="layui-form-item">
         <label class="layui-form-label">生效时间</label>
         <div class="layui-input-block">
-            <input type="text" id="test6" name="endTime" readonly="readonly" placeholder="yyyy-MM-dd HH:mm:ss" value="" class="layui-input">
+            <input type="text" id="test6" name="endTime" readonly="readonly" placeholder="yyyy-MM-dd HH:mm:ss" value="" class="layui-input width50">
         </div>
     </div>
 
@@ -71,7 +77,7 @@
             success:function (rec) {
 
                 $("input[name='title']").val(rec.title);
-                $("input[name='content']").val(rec.content);
+                $("textarea[name='content']").val(rec.content);
                 $("input[name='publisher']").val(rec.publisher);
                 $("input[name='startTime']").val(rec.startTime);
                 $("input[name='endTime']").val(rec.endTime);

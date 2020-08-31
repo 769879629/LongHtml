@@ -8,41 +8,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="lib/layui-v2.5.5/css/layui.css" media="all">
     <link rel="stylesheet" href="css/public.css" media="all">
+    <style>
+        .width50{width: 150px}
+    </style>
 </head>
 <body>
 <div class="layui-form layuimini-form">
     <div class="layui-form-item">
         <label class="layui-form-label required">标题</label>
         <div class="layui-input-block">
-            <input type="text" name="title" lay-verify="required" lay-reqtext="不能为空" readonly="readonly" placeholder="请输入编码" value="" class="layui-input">
+            <input type="text" name="title"  readonly="readonly"  value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">内容</label>
         <div class="layui-input-block">
-            <input type="text" name="content" lay-verify="required" lay-reqtext="不能为空" readonly="readonly" placeholder="请输入名称" value="" class="layui-input">
+            <input type="text" name="content"  readonly="readonly"  value="" class="layui-input width50">
 
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">发布人</label>
         <div class="layui-input-block">
-            <input type="text"  name="publisher" lay-verify="required" readonly="readonly" value="" class="layui-input">
+            <input type="text"  name="publisher"  readonly="readonly" value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">附件名称</label>
         <div class="layui-input-block">
-            <input type="text"  name="fileName" lay-verify="required" readonly="readonly" value="" class="layui-input">
+            <input type="text"  name="fileName"   readonly="readonly" value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">附件存放路径</label>
         <div class="layui-input-block">
-            <input type="text"  name="filePath" lay-verify="required" readonly="readonly" value="" class="layui-input">
+            <input type="text"  name="filePath"   readonly="readonly" value="" class="layui-input width50">
         </div>
     </div>
-
+    <div class="layui-form-item">
+        <label class="layui-form-label required">附件类型</label>
+        <div class="layui-input-block">
+            <input type="text"  name="typeName"   readonly="readonly" value="" class="layui-input width50">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">文件大小</label>
+        <div class="layui-input-block">
+            <input type="text"  name="fileSize"   readonly="readonly" value="" class="layui-input width50">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">上传时间</label>
+        <div class="layui-input-block">
+            <input type="text"  name="uploadTime"   readonly="readonly" value="" class="layui-input width50">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">文件</label>
+        <div class="layui-input-block">
+            <input name="fileName" id="fileName" value="" class="layui-input width50" style=" border:none;">
+            <a id="a" href="javascript:void(0);"><button class="layui-btn layui-btn-normal" style="background: #da4f49" >文件下载</button></a>
+        </div>
+    </div>
 </div>
 <script src="lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
 <script>
@@ -68,11 +95,16 @@
                 $("input[name='publisher']").val(rec.publisher);
                 $("input[name='fileName']").val(rec.fileName);
                 $("input[name='filePath']").val(rec.filePath);
+                $("input[name='fileSize']").val(rec.fileSize);
+                $("input[name='uploadTime']").val(rec.uploadTime);
+                $("input[name='typeName']").val(rec.typeName);
 
             }
         })
 
 
+        var fileName= $("input[name='fileName']").val();
+        $('#a').attr("href","http://localhost:8080/inf/download.do?fileName="+fileName);
 
 
     });

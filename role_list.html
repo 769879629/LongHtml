@@ -34,9 +34,33 @@
 <script src="lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
 <script>
     layui.use(['form', 'table'], function () {
+
         var $ = layui.jquery,
             form = layui.form,
             table = layui.table;
+        var queryString=window.location.search.substring(1);
+        $.ajax({
+            url:"http://localhost:8080/role/page.do",
+            type:"post",
+            dataType:"json",
+            async: false,
+            xhrFields:{
+                // 发送 AJAX 请求时带上 cookie
+                withCredentials:true
+            },
+            success:function (rec) {
+
+                if(rec.code==0){
+                }else{
+                    layer.msg(rec.msg)
+                }
+
+            },
+            error:function(){
+                layer.msg("error")
+            }
+        })
+
 
         table.render({
             elem: '#currentTableId',
@@ -48,19 +72,19 @@
                 icon: 'layui-icon-tips'
             }],
             cols: [[
-                {type: "checkbox", width: 50},
-                {field: 'id', width: 120, title: 'ID', sort: true},
-                {field: 'roleCode', width: 120, title: '角色编码', sort: true},
-                {field: 'roleName', width: 150, title: '角色名称', sort: true},
-                {field: 'createDate', width: 150, title: '创建日期'},
-                {field: 'isStart', width: 80, title: '是否启用',templet: function (item) {
+                {type: "checkbox"},
+                {field: 'id',  title: 'ID', sort: true},
+                {field: 'roleCode', title: '角色编码', sort: true},
+                {field: 'roleName', title: '角色名称'},
+                {field: 'createDate',  title: '创建日期'},
+                {field: 'isStart',  title: '是否启用',templet: function (item) {
                         if (item.isStart == '0') {
                             return "未启用";
                         } else if (item.isStart == '1') {
                             return "已启用";
                         }}},
-                {field: 'createBy', width: 80, title: '创建者'},
-                {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
+                {field: 'createBy',title: '创建者'},
+                {title: '操作',toolbar: '#currentTableBar', align: "center"}
             ]],
             limits: [10, 15, 20, 25, 50, 100],
             limit: 15,
@@ -82,7 +106,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['100%', '100%'],
-                    content: 'goods_add.html',
+                    content: 'role_add.html',
                 });
                 $(window).on("resize", function () {
                     layer.full(index);
@@ -119,30 +143,26 @@
                 return false;
             } else if (obj.event === 'delete') {
 
-                form.on('submit(modify)', function (data) {
-                    data = data.field;
-                    console.log(data)
+                form.on('submit(modify)', function () {
+                    console.log("aaaa"+data.id)
                     $.ajax({
-                        url:"http://localhost:8080/role/modify.do?id="+data.id,
+                        url:"http://localhost:8080/role/del.do?id="+data.id,
                         type:"post",
-                        data:data,
+                        data:queryString,
                         dataType:"json",
                         async: false,
                         xhrFields:{
                             withCredentials:true
                         },
                         success:function (rec) {
+                            if (rec.code==0) {
+                                layer.msg(rec.msg, function () {
+                                    window.location.reload()
+                                }); }else {
+                                //认证不成功
+                                layer.msg(rec.msg);
 
-                            layer.msg(rec.msg);
-                            layui.use('layer', function(){
-                                var layer = layui.layer;
-                                layer.alert("用户锁定成功！",
-                                    function () {
-                                        window.parent.location.reload();//刷新父页面
-                                        parent.layer.close(index);//关闭当前的弹窗
-                                    }
-                                );
-                            });
+                            }
 
                         }
                     })

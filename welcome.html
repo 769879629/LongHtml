@@ -21,143 +21,188 @@
 </style>
 <body>
 <div class="layuimini-container">
-	
-	 <div class="layui-box">
-        <div class="layui-row layui-col-space10">
-            <div class="layui-col-md12">
-                <blockquote class="layui-elem-quote main_btn">
-                    <p>欢迎使用上元代理商管理系统</p>
-                </blockquote>
-            </div>
-        </div>
-    </div>
-
-	
-	  <div class="layui-box">
-        <div class="layui-row layui-col-space10">
-            <div class="layui-col-md12">
-                <blockquote class="layui-elem-quote main_btn">
-                    <p>公告栏</p>
-                    <button id="affiche" style="float:right;line-height: 0px;margin-top: -20px"  type="button">更多</button>
-                </blockquote>
-                <div>
-                    <table id="role-table1" class="layui-table" lay-filter="data-dictionary-table">
-                    </table>
-                </div>
-
-            </div>
-        </div>
-    </div>
-   
-    <div class="layui-box">
-        <div class="layui-row layui-col-space10">
-            <div class="layui-col-md12">
-                <blockquote class="layui-elem-quote main_btn">
-                    <p>资讯栏</p>
-                </blockquote>
-                <div>
-                    <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
-                    </table>
+    <div class="layuimini-main">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md8">
+                <div class="layui-row layui-col-space15">
+                    <div class="layui-col-md12" >
+                        <div class="layui-card" style="height: 200px">
+                            <div class="layui-card-header"><i class="fa fa-bullhorn icon icon-tip"></i>系统公告</div>
+                            <div class="layui-card-body layui-text">
+                                <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+                            </div>
+                        </div>
+                        <div class="layui-card" style="height: 200px">
+                            <div class="layui-card-header"><i class="fa fa-fire icon"></i>资讯</div>
+                            <div class="layui-card-body layui-text">
+                                <table class="layui-hide" id="currentTableId1" lay-filter="currentTableFilter"></table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-md12" >
+                        <div class="layui-card">
+                            <div class="layui-card-header"><i class="fa fa-line-chart icon"></i>商品销售额</div>
+                            <div class="layui-card-body">
+                                <div id="main" style="width: 100%;min-height:330px"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <div class="layui-col-md4">
+                <div class="layui-card">
+                    <div class="layui-form layuimini-form">
+                        <div class="layui-card-header"><i class="fa fa-eyedropper icon "></i>会员销售额</div>
+                        <div id="main1" style="width: 100%;min-height:300px"></div>
+                    </div>
+                </div>
+
+
+                <div class="layui-card" style="height: 300px">
+                    <div class="layui-card-header"><i class="fa fa-fire icon"></i>会员数</div>
+                    <div class="layui-card-body layui-text">
+                        <div id="echarts-pies" style="background-color:#ffffff;min-height:400px;padding: 10px"></div>
+                    </div>
+                </div>
+
+
+            </div>
         </div>
     </div>
-    
-    
-
-   
 </div>
+<script src="lib/echarts.min.js" charset="utf-8"></script>
+<script src="lib/jquery-3.4.1/jquery-3.3.1.js" charset="utf-8"></script>
 <script src="lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
-<script src="js/lay-config.js?v=2.0.0" charset="utf-8"></script>
 
 <script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+        var queryString=window.location.search.substring(1);
 
-    layui.use(['table', 'treetable','layer','form'], function () {
-        var $ = layui.jquery;
-        var table = layui.table;
-        var treetable = layui.treetable;
-        var layer = layui.layer;
-        var form = layui.form;
-        table.on('tool(test)', function(obj) {
-
-            var layEvent = obj.event; //获取lay-event中的值(detail,edit,del)
-            if(layEvent == 'find') {
-                location.href="/affiche_one.html?id="+id;
-            }
-        });
-
-        table.render({
-            elem: '#role-table1'
-            ,url: 'http://localhost:8080/aff/findFive.do'
-            ,toolbar: '#headertoolbar1'
-            ,parseData:function(res){//res 即为原始返回的数据
-
-                console.log(res)
-
-                return {
-                    "code":0,
-                    "msg":"",
-                    "count":5,
-                    data:res
-                };
-
-            }
-            ,cols: [[ //表头
-                ,{field: 'title', title: '标题',sort: true,align:'center'}
-                ,{field: 'content', title: '内容',sort: true,align:'center'}
-                ,{field: 'publisher', title: '发布人',sort: true,align:'center'}
-                ,{field: 'publishTime', title: '发布时间',sort: true,align:'center'}
-                ,{title: '操作',toolbar:"#find",sort: true,align:'center'}
-            ]]
-
-        });
-           $("#affiche").on("click",function () {
-            layer.open({
-                type:2,
-                area: ['800px', '600px'],
-                content: 'affiche_all.html',
-                cancel: function(index, layero){
-                    //刷新页面
-                    window.location.reload();
+        $.ajax({
+            url:"http://localhost:8080/session.do",
+            type: "post",
+            dataType: "json",
+            xhrFields: {
+                // 发送 AJAX 请求时带上 cookie
+                withCredentials: true
+            },
+            success:function (rec) {
+                if (rec.data.roleId==1){
+                    $("#add").html(" <button class=\"layui-btn layui-btn-normal layui-btn-sm data-add-btn\" lay-event=\"add\"> 添加 </button>")
                 }
-            });
-        });
-
-
-
-        table.render({
-            elem: '#role-table2'
-            ,url: 'http://localhost:8080/information/InvFive.do'
-            ,toolbar: '#headertoolbar2'
-            ,where:{
-                disabled:true
-            }
-            ,cols: [[ //表头
-                ,{field: 'title', title: '标题',}
-                ,{field: 'content', title: '内容'}
-                ,{field: 'publisher', title: '发布人'}
-                ,{field: 'publishTime', title: '发布时间',}
-            ]]
-
-        });
-
-        $("#information").on("click",function () {
-
-
-            layer.open({
-                type:2,
-                area: ['800px', '600px'],
-                content: 'page/information_all.html',
-                cancel: function(index, layero){
-                    //刷新页面
-                    window.location.reload();
+                if (rec.data.roleId!=1) {
+                    $("#delete").hide();
                 }
-            });
-
+            }
         })
 
 
+        table.render({
+            elem: '#currentTableId',
+            url: 'http://localhost:8080/aff/findAll.do',
+            parseData:function(res){//res 即为原始返回的数据
+                console.log(res)
+                return {
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data.list,
+                    "id": res.data.list.id
+                };
+            },cols: [[ //表头
+                {field: 'title', title: '标题',align:'center'}
+                ,{field: 'content', title: '内容',align:'center'}
+                ,{field: 'publisher', title: '发布人',align:'center'}
+                ,{field: 'publishTime', title: '发布时间',sort: true,align:'center'}
+                ,{title: '操作',toolbar:"#currentTableBar",align:'center'}
+            ]],
+            limits: [1, 5, 10, 15, 20, 30],
+            limit: 5,
+            page: false,
+            skin: 'line'
+        });
+
+
+
+        /**
+         * toolbar监听事件
+         */
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {  // 监听添加操作
+                var index = layer.open({
+                    title: '添加公告',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: 'affiche_add.html',
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            }  });
+
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            console.log("data="+data.id)
+            if (obj.event === 'edit') {
+
+                var index = layer.open({
+                    title: '查看公告',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: 'affiche_one.html?id='+data.id,
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+                return false;
+            } else if (obj.event === 'delete') {
+                form.on('submit(modify)', function () {
+                    $.ajax({
+                        url:"http://localhost:8080/aff/remove.do?id="+data.id,
+                        type:"post",
+                        data:queryString,
+                        dataType:"json",
+                        xhrFields:{
+                            withCredentials:true
+                        },
+                        success:function (rec) {
+                            layer.msg(rec.msg);
+                            layui.use('layer', function(){
+                                console.log(data)
+                                layer.msg(rec.msg);
+                                layui.use('layer', function(){
+                                    if (rec.code==0){
+                                        layer.alert(rec.msg,
+                                            function () {
+                                                window.parent.location.reload();//刷新父页面
+                                            }
+                                        );
+                                    } else {
+                                        layer.msg(rec.msg);
+                                    }
+                                });
+                            });
+
+                        }
+                    })
+
+                    return false;
+                });
+            }
+        });
+
     });
+
 </script>
 <script>
     layui.use(['form', 'table'], function () {
@@ -167,45 +212,51 @@
         var queryString=window.location.search.substring(1);
 
 
+        $.ajax({
+            url:"http://localhost:8080/session.do",
+            type: "post",
+            dataType: "json",
+            xhrFields: {
+                // 发送 AJAX 请求时带上 cookie
+                withCredentials: true
+            },
+            success:function (rec) {
+                if (rec.data.roleId==1){
+                    $("#add").html(" <button class=\"layui-btn layui-btn-normal layui-btn-sm data-add-btn\" lay-event=\"add\"> 添加 </button>")
+                }
+                if (rec.data.roleId!=1) {
+                    $("#delete").hide();
+                }
+            }
+        })
+
+
+
         table.render({
-            elem: 'currentTableId',
+            elem: '#currentTableId1',
             url: 'http://localhost:8080/inf/findlist.do',
-            toolbar: '#toolbarDemo',
-            defaultToolbar: ['filter', 'exports', 'print', {
-                title: '提示',
-                layEvent: 'LAYTABLE_TIPS',
-                icon: 'layui-icon-tips'
-            }],
+
             parseData:function(res){//res 即为原始返回的数据
                 console.log(res)
                 return {
-                    "code":0,
-                    "msg":"",
-                    "count":5,
-                    data:res
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data.list,
+                    "id": res.data.list.id
                 };
             },
             cols: [[
-                {field: 'title', width: 80, title: '标题', sort: true},
-                {field: 'content', width: 80, title: '内容', sort: true},
-                {field: 'state', width: 80, title: '发布状态',templet: function (item) {
-                        if (item.state == '0') {
-                            return "未发布";
-                        } else if (item.state == '1') {
-                            return "已发布";
-                        }}},
-                {field: 'publisher', width: 90, title: '发布人'},
-                {field: 'publishTime', width: 80, title: '发送时间'},
-                {field: 'typeName', width: 100, title: '附件类型'},
-                {field: 'fileName', width: 100, title: '附件名称'},
-                {field: 'filePath', width: 100, title: '附件存放路径'},
-                {field: 'fileSize', width: 100, title: '附件大小'},
-                {field: 'uploadTime', title: '上传时间', width: 120, sort: true},
-                {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
+                {field: 'title', title: '标题',  },
+                {field: 'content', title: '内容',  },
+                {field: 'publisher', title: '发布人'},
+                {field: 'publishTime', title: '发送时间'},
+                {field: 'fileName',title: '附件'},
+                {title: '操作',toolbar: '#currentTableBar', align: "center"}
             ]],
-            limits: [10, 15, 20, 25, 50, 100],
-            limit: 15,
-            page: true,
+            limits: [1, 5, 10, 15, 20, 30],
+            limit: 5,
+            page: false,
             skin: 'line'
         });
 
@@ -272,17 +323,12 @@
                             withCredentials:true
                         },
                         success:function (rec) {
-
-                            layer.msg(rec.msg);
-                            layui.use('layer', function(){
-                                var layer = layui.layer;
-                                layer.alert("删除成功！",
-                                    function () {
-                                        window.parent.location.reload();//刷新父页面
-                                        parent.layer.close(index);//关闭当前的弹窗
-                                    }
-                                );
-                            });
+                            if (rec.code == 0) {
+                                alert(rec.msg)
+                                window.parent.location.reload();
+                            }else {
+                                alert(rec.msg)
+                            }
 
                         }
                     })
@@ -296,8 +342,217 @@
 
     });
 </script>
-<script type="text/html" id="find">
-    <a class="layui-btn layui-btn-xs" id="find1"  lay-event="find">查看</a>
+<script type="text/javascript">
+
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+        var property;
+        var xAxis;
+        var data;
+        var data1;
+        var queryString = window.location.search.substring(1);
+        var uid = "";
+
+        $.ajax({
+            url: "http://localhost:8080/session/session.do",
+            data: queryString,
+            type: "post",
+            async: false,
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function (rec) {
+                uid = rec.data.id;
+            }
+        })
+
+
+        $.ajax({
+            url: "http://localhost:8080/mr/findAll.do",
+            type: "post",
+            async: false,
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function (rec) {
+                data = rec;
+            }
+        })
+
+
+        var myChart = echarts.init(document.getElementById('main'));
+        var createtime=[] ;
+        var money=[] ;
+        var timeo=[];
+        var type=[];
+        for (var i = data.length-1; i >=0 ; i--) {
+            var totalMoney = data[i].totalMoney;
+            var createTime = data[i].createTime;
+            var type1 = data[i].type;
+
+            money.push(totalMoney);
+            timeo.push(createTime);
+            type.push(type1);
+
+        }
+
+
+        // 指定图表的配置项和数据
+        var option = {
+            tooltip: {
+                trigger: 'axis'
+            }, grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            legend: {
+                data: ['销售额']
+            },
+            xAxis:
+                {
+                    data:timeo
+                }
+            ,
+            yAxis: {
+                name: '销售额',
+                type : 'value',
+                splitArea : {show : true},
+
+            },
+            series: [{
+                name: '时间',
+                type: 'bar',
+                data: money,
+                color:'#84C1FF'
+
+            }]
+
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+
+
+
+        var myChart1 = echarts.init(document.getElementById('main1'));
+
+        var optionRecords = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985'
+                    }
+                }
+            },
+            legend: {
+                data: ['会员收入']
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: timeo
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                }
+            ],
+            series: [
+                {
+                    name: '商品收入',
+                    type: 'line',
+                    stack: '总量',
+                    areaStyle: {},
+                    data: money
+                }
+
+            ]
+        };
+        myChart1.setOption(optionRecords);
+
+        $.ajax({
+            url: "http://localhost:8080/user/findlist.do",
+            type: "post",
+            async: false,
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function (rec) {
+                data = rec;
+            }
+        })
+
+
+
+        var echartsPies = echarts.init(document.getElementById('echarts-pies'), 'walden');
+        var optionPies = {
+            title: {
+                text: '会员数',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: '{a} <br/>{b} : {c} ({d}%)'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: ['注册会员', '黄金会员', '白金会员', '钻石会员', '管理员']
+            },
+            series: [
+                {
+                    name: '访问来源',
+                    type: 'pie',
+                    radius: '55%',
+                    center: ['50%', '60%'],
+                    roseType: 'radius',
+                    data: [
+                        {value: 3, name: '注册会员'},
+                        {value: 2, name: '黄金会员'},
+                        {value: 0, name: '白金会员'},
+                        {value: 1, name: '钻石会员'},
+                        {value: 1, name: '管理员'}
+                    ],
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        echartsPies.setOption(optionPies);
+    });
+
+
+</script>
+<script type="text/html" id="currentTableBar">
+    <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">查看</a>
 </script>
 </body>
 </html>

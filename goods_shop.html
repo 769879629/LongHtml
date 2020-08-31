@@ -14,26 +14,34 @@
     <div class="layuimini-main">
 
 
-
         <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
 
 
         <div class="layui-form-item">
             <div class="layui-input-block">
-
-                <button class="layui-btn" style="float:right "  lay-submit  lay-filter="modify">购买</button>
+                <div id="footer">
+                    结算
+                    总价钱:
+                    <span class="allprice">0</span>
+                    总数量:
+                    <span class="allnum">0</span>
+                    <input id="delete" type="button" class="layui-btn" lay-submit lay-filter="modify" value="删除"/>
+                </div>
+                <input id="pay" type="button" class="layui-btn" lay-submit lay-filter="modify" value="结算"/>
             </div>
         </div>
 
     </div>
 </div>
 <script src="lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="lib/jquery-3.4.1/jquery-3.3.1.js"></script>
 <script>
     layui.use(['form', 'table'], function () {
         var $ = layui.jquery,
             form = layui.form,
             table = layui.table;
-        var createBy="";
+        var createBy = "";
+        var id = "";
 
         $.ajax({
             url: "http://localhost:8080/session.do",
@@ -43,59 +51,175 @@
             xhrFields: {
                 withCredentials: true
             },
-            success: function(rec) {
+            success: function (rec) {
                 createBy = rec.data.username;
-                console.log("createBy="+createBy);
+                id = rec.data.id;
+                console.log("createBy=" + createBy);
             }
 
         })
 
         table.render({
             elem: '#currentTableId',
-            url: 'http://localhost:8080/cart/findlist.do?createBy='+createBy,
+            url: 'http://localhost:8080/cart/findlist.do?createBy=' + createBy,
             toolbar: '#toolbarDemo',
             async: false,
             xhrFields: {
                 withCredentials: true
             },
+            id: 'idTest',
             defaultToolbar: ['filter', 'exports', 'print', {
                 title: '提示',
                 layEvent: 'LAYTABLE_TIPS',
                 icon: 'layui-icon-tips'
             }],
-            parseData:function(res){//res 即为原始返回的数据
+            parseData: function (res) {//res 即为原始返回的数据
                 console.log(res)
                 return {
-                    "code":0,
-                    "msg":"",
-                    "count":5,
-                    data:res
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data.list,
+                    id: res.data.list.id
                 };
             },
             cols: [[
-                {type: "checkbox", width: 50},
-                {field: 'goodsName', width: 200, title: '商品名称', sort: true},
-                {field: 'goodsNum', width: 200, title: '商品数量'},
-                {field: 'goodsPrice', width: 200, title: '商品价格',sort: true},
-                {field: 'totalPrice', width: 200, title: '商品总价',sort: true,templet:function (ss) {
-                        return ss.goodsNum*ss.goodsPrice;
-                    }},
+                {type: "checkbox",},
+                {field: 'goodsName', title: '商品名称', sort: true},
+                {field: 'goodsNum', edit: 'num', title: '商品数量'},
+                {field: 'goodsPrice', title: '商品价格', sort: true}
             ]],
 
         });
 
         //监听表格复选框选择
         table.on('checkbox(currentTableFilter)', function (obj) {
-            console.log("aaa"+obj.data)
+            var array = layui.table.checkStatus('idTest').data;
+            var allnum = 0;
+            var allprice = 0;
+            var goodsId=[];
+            for (var i = 0; i < array.length; i++) {
+                allnum += array[i].goodsNum;
+                allprice += array[i].goodsPrice * array[i].goodsNum;
+                goodsId.push(array[i].goodsId);
+            }
+            $(".allprice").html(allprice);
+            $(".allnum").html(allnum);
+            form.render();
+
+
+            $("#delete").click(function () {
+                var idlist = [];
+                var goodsNumlist = [];
+
+                for (var i = 0; i < array.length; i++) {
+                    idlist.push(array[i].id)
+                    goodsNumlist.push(array[i].goodsNum)
+
+                }
+                console.log(idlist)
+                console.log(idlist)
+                for (var i = 0; i < idlist.length; i++) {
+                    $.ajax({
+                        url: "http://localhost:8080/cart/deleteById.do?id=" + idlist[i],
+                        type: "post",
+                        dataType: "json",
+                        async: false,
+                        xhrFields: {
+                            withCredentials: true
+                        },
+                        success: function (rec) {
+                            if (rec.code == 0) {
+                                layer.alert("删除成功",
+                                    function () {
+                                        window.location.reload();//刷新父页面
+                                    });
+                            } else {
+                                layer.msg("删除失败");
+                                return false;
+                            }
+                        }
+                    })
+                }
+                return false;
+            })
+            $("#pay").click(function () {
+                                $.ajax({
+                                    url: "http://localhost:8080/io/add.do",
+                                    type: "post",
+                                    dataType: "json",
+                                    data: {
+                                        "orderPrice": allprice,
+                                        "createBy": createBy,
+                                        "userId": id,
+                                        "goodsId":goodsId,
+                                        "num":allnum
+                                    },
+                                    async: false,
+                                    xhrFields: {
+                                        withCredentials: true
+                                    },
+                                    success: function (rec) {
+                                        if (rec.code == 0) {
+                                            var idlist = [];
+                                            var goodslist = [];
+                                            var goodsNumlist = [];
+                                            for (var i = 0; i < array.length; i++) {
+                                                idlist.push(array[i].id)
+                                                goodslist.push(array[i].goodsId)
+                                                goodsNumlist.push(array[i].goodsNum)
+                                            }
+                                            console.log("goodsNumlist" + goodsNumlist)
+                                            for (var i = 0; i < idlist.length; i++) {
+                                                $.ajax({
+                                                    url: "http://localhost:8080/cart/deleteById.do?id=" + idlist[i],
+                                                    type: "post",
+                                                    dataType: "json",
+                                                    async: false,
+                                                    xhrFields: {
+                                                        withCredentials: true
+                                                    },
+                                                    success: function (rec) {
+                                                        if (rec.code == 0) {
+                                                            $.ajax({
+                                                                url: "http://localhost:8080/goods/modifynum.do?num=" + goodsNumlist[i] + "&id=" + goodslist[i],
+                                                                type: "post",
+                                                                dataType: "json",
+                                                                async: false,
+                                                                xhrFields: {
+                                                                    withCredentials: true
+                                                                },
+                                                                success: function (rec) {
+                                                                    if (rec.code == 0) {
+                                                                        layer.alert("购买成功！",
+                                                                            function () {
+                                                                                window.location.reload();//刷新父页面
+                                                                            });
+                                                                    } else {
+                                                                        layer.msg("购买失败！");
+                                                                        return false;
+                                                                    }
+                                                                }
+                                                            })
+                                                        } else {
+                                                            layer.msg(rec.msg);
+                                                            return false;
+                                                        }
+                                                    }
+                                                })
+                                            }
+                                            return false;
+                                        } else {
+                                            layer.msg(rec.msg);
+                                            return false;
+                                        }
+                                    }
+                                })
+            })
         });
-
-
-
-
-
-
-
     });
+
+
 </script>
 
 </body>

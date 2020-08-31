@@ -12,6 +12,14 @@
         body {
             background-color: #ffffff;
         }
+
+         .width50{
+             width: 200px;
+         }
+        .width10{
+            width: 200px;
+            height: 200px;
+        }
     </style>
 </head>
 <body>
@@ -19,36 +27,34 @@
     <div class="layui-form-item">
         <label class="layui-form-label required">标题</label>
         <div class="layui-input-block">
-            <input type="text" name="title" lay-verify="required" lay-reqtext="不能为空" placeholder="请输入编码" value="" class="layui-input">
+            <input type="text" name="title" lay-verify="required" lay-reqtext="不能为空" placeholder="请输入编码" value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">内容</label>
         <div class="layui-input-block">
-            <textarea type="text" name="content" lay-verify="required" lay-reqtext="不能为空" placeholder="请输入名称" value="" class="layui-input">
-                </textarea>
+            <textarea type="text" name="content" lay-verify="required" lay-reqtext="不能为空" placeholder="请输入名称" class="layui-input  width10"></textarea>
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">发布人</label>
         <div class="layui-input-block">
-            <input type="text"  name="publisher" lay-verify="required"  value="" class="layui-input">
+            <input type="text"  name="publisher" readonly="readonly" value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">生效时间</label>
         <div class="layui-input-block">
-            <input type="text" id="test5" name="startTime"  placeholder="yyyy-MM-dd HH:mm:ss" value="" class="layui-input">
+            <input type="text" class="layui-input width50" id="startTime" name="startTime" placeholder="yyyy-MM-dd HH:mm:ss">
         </div>
     </div>
 
     <div class="layui-form-item">
-        <label class="layui-form-label">生效时间</label>
+        <label class="layui-form-label">实效时间</label>
         <div class="layui-input-block">
-            <input type="text" id="test6" name="endTime"  placeholder="yyyy-MM-dd HH:mm:ss" value="" class="layui-input">
+            <input type="text" class="layui-input width50" id="endTime" name="endTime" placeholder="yyyy-MM-dd HH:mm:ss">
         </div>
     </div>
-
     <div class="layui-form-item">
         <div class="layui-input-block">
             <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认发布</button>
@@ -62,12 +68,20 @@
 </div>
 <script src="lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
 <script>
-    layui.use(['form'], function () {
+    layui.use(['form','laydate'], function () {
         var form = layui.form,
             layer = layui.layer,
             $ = layui.$;
-
-
+        var id="";
+        var laydate = layui.laydate;
+        laydate.render({
+            elem:'#startTime'
+            ,type: 'datetime'
+        });
+        laydate.render({
+            elem:'#endTime'
+            ,type: 'datetime'
+        });
         $.ajax({
             url: "http://localhost:8080/session.do",
             type: "post",
@@ -78,7 +92,6 @@
             },
             success: function(rec) {
                 id = rec.data.id;
-                console.log("modifyid="+id);
             }
 
         })
@@ -90,7 +103,7 @@
                 withCredentials:true
             },
             success:function (rec) {
-                $("input[name='publisher']").val(rec.username);
+                $("input[name='publisher']").val(rec.data.username);
             }
         })
 
@@ -108,18 +121,19 @@
                     withCredentials:true
                 },
                 success:function (rec) {
-
+                    console.log(data)
                     layer.msg(rec.msg);
                     layui.use('layer', function(){
-                        var layer = layui.layer;
-                        layer.alert("发布成功！",
-                            function () {
-                                window.parent.location.reload();//刷新父页面
-                                parent.layer.close(index);//关闭当前的弹窗
-                            }
-                        );
+                        if (rec.code==0){
+                            layer.alert(rec.msg,
+                                function () {
+                                    window.parent.location.reload();//刷新父页面
+                                }
+                            );
+                        } else {
+                            layer.msg(rec.msg);
+                        }
                     });
-
                 }
             })
 

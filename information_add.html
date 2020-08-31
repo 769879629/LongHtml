@@ -12,6 +12,13 @@
         body {
             background-color: #ffffff;
         }
+        .width50{
+            width: 300px;
+        }
+        .width10{
+            width: 300px;
+            height: 150px;
+        }
     </style>
 </head>
 <body>
@@ -19,139 +26,115 @@
     <div class="layui-form-item">
         <label class="layui-form-label required">标题</label>
         <div class="layui-input-block">
-            <input type="text" name="title" lay-verify="required" lay-reqtext="不能为空" placeholder="请输入编码" value="" class="layui-input">
+            <input type="text" id="title" name="title" lay-verify="required" lay-reqtext="不能为空" placeholder="请输入标题" value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">内容</label>
         <div class="layui-input-block">
-            <textarea type="text" name="content" lay-verify="required" lay-reqtext="不能为空" placeholder="请输入名称" value="" class="layui-input">
-                </textarea>
+            <textarea type="text" id="content" name="content" lay-verify="required" lay-reqtext="不能为空" placeholder="请输入内容" value="" class="layui-input width10"></textarea>
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">发布人</label>
         <div class="layui-input-block">
-            <input type="text"  name="publisher" lay-verify="required"  value="" class="layui-input">
+            <input type="text" id="publisher" name="publisher" lay-verify="required"  value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">上传文件</label>
-        <input type="file" name="file" id="test3">
+        <div class="layui-input-block">
+            <input type="file" name="fileName" id="fileName" class="layui-input" style="width: 190px">
+            <tip style="color: red">*文件不能超过9M</tip>
+        </div>
     </div>
     <div class="layui-form-item">
         <div class="layui-input-block">
-            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认发布</button>
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="add" id="add">确认发布</button>
         </div>
     </div>
 </div>
 
 
-<div   style="height: 500px;width: 100%" >
+<div style="height: 500px;width: 100%" >
 
 </div>
 <script src="lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="lib/jquery-3.4.1/jquery-3.3.1.js" charset="utf-8"></script>
 <script>
-    layui.use(['form'], function () {
-        var form = layui.form,
-            layer = layui.layer,
-            $ = layui.$;
+    var queryString = window.location.search.substring(1);
+    var maxSize = 1024 * 9;
 
+    var id="";
+    $.ajax({
+        url: "http://localhost:8080/session.do",
+        type: "post",
+        dataType: "json",
+        async: false,
+        xhrFields: {
+            withCredentials: true
+        },
+        success: function(rec) {
+            id = rec.data.id;
+            console.log("modifyid="+id);
+        }
+    })
+    $.ajax({
+        url:"http://localhost:8080/user/findOne.do?id="+id,
+        type:"post",
+        async: false,
+        xhrFields:{
+            withCredentials:true
+        },
+        success:function (rec) {
+            $("input[name='publisher']").val(rec.data.username);
 
-        $.ajax({
-            url: "http://localhost:8080/session.do",
-            type: "post",
-            dataType: "json",
-            async: false,
-            xhrFields: {
-                withCredentials: true
-            },
-            success: function(rec) {
-                id = rec.data.id;
-                console.log("modifyid="+id);
-            }
-
-        })
-        $.ajax({
-            url:"http://localhost:8080/user/findOne.do?id="+id,
-            type:"post",
-            async: false,
-            xhrFields:{
-                withCredentials:true
-            },
-            success:function (rec) {
-                $("input[name='publisher']").val(rec.username);
-            }
-        })
-
-        //监听提交
-        form.on('submit(saveBtn)', function (data) {
-            data = data.field;
-            console.log(data)
+        }
+    })
+    document.querySelector('button[id=add]').onclick = function () {
+        var data = new FormData();
+        data.append("title", $("#title").val());
+        data.append("content", $("#content").val());
+        data.append("publisher", $("#publisher").val());
+        data.append("file", $("#fileName")[0].files[0]);
+        var fileName = document.getElementById('fileName').files[0];
+        var size = "";
+        if (fileName == undefined) {
+            size = 0;
+        } else {
+            size = fileName.size;
+        }
+        var filesize = (size / 1024).toFixed(2);
+        console.log(filesize)
+        data.append("size", filesize);
+        if (filesize < maxSize) {
             $.ajax({
-                url:"http://localhost:8080/inf/addOne.do",
-                type:"post",
-                data:data,
-                dataType:"json",
+                url: "http://localhost:8080/inf/addOne.do",
+                type: "post",
+                data: data,
+                dataType: "json",
+                contentType:false,
+                processData:false,
                 async: false,
                 xhrFields:{
                     withCredentials:true
                 },
-                success:function (rec) {
-
-                    layer.msg(rec.msg);
-                    layui.use('layer', function(){
-                        var layer = layui.layer;
-                        layer.alert("发布成功！",
-                            function () {
-                                window.parent.location.reload();//刷新父页面
-
-                            }
-                        );
-                    });
-
+                success: function (rec) {
+                    console.log("aaa"+data);
+                    if (rec.code == 0) {
+                        alert(rec.msg)
+                        window.parent.location.reload();
+                    }else {
+                        alert(rec.msg)
+                    }
                 }
             })
+        } else {
+            alert('上传文件不许大于9M');
+        }
 
-            return false;
-        });
+    }
 
-    });
-
-
-    layui.use('laydate', function() {
-        var laydate = layui.laydate;
-
-
-        laydate.render({
-            elem: '#test5'
-            ,type: 'datetime'
-        });
-
-        laydate.render({
-            elem: '#test6'
-            ,type: 'datetime'
-        });
-
-    })
-
-
-    layui.use('upload', function() {
-        var $ = layui.jquery
-            , upload = layui.upload;
-
-        upload.render({
-            elem: '#test3'
-            ,url: 'https://httpbin.org/post' //改成您自己的上传接口
-            ,accept: 'file' //普通文件
-            ,done: function(res){
-                // layer.msg('上传成功');
-                console.log(res);
-            }
-        });
-
-
-    })
 </script>
 </body>
 </html>

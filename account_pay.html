@@ -24,7 +24,6 @@
                 <label class="layui-form-label required">充值费用:：</label>
                 <div class="layui-input-block">
                     <input type="text" name="moneyIn" lay-verify="required"   value="" class="layui-input width50">
-                    <tip>每日限额50000</tip>
                 </div>
             </div>
 
@@ -81,51 +80,49 @@
             }
         })
 
+
         form.on('submit(modify)', function (data) {
-            let val = $("input[name='otherAccountId']").val;
-            if (val>50000){
-                layer.msg('充值金额超过50000！');
-                return false;
-            }
             data = data.field;
             console.log(data)
-            $.ajax({
-                url:"http://localhost:8080/acc/insertone.do?accountId="+id,
-                type:"post",
-                data:data,
-                dataType:"json",
-                async: false,
-                xhrFields:{
-                    withCredentials:true
-                },
-                success:function (rec) {
-                    layer.open({
-                        title: "输入密码",
-                        content: '输入密码：<input type="password" id="password" name="password">'
-                        ,btn: '确认充值'
-                        ,yes:function () {
-                            var password1 = $("#password").val();
-                            if (password==password1){
+            layer.open({
+                title: "输入密码",
+                content: '输入密码：<input type="password" id="password" name="password">'
+                ,btn: ['确认充值','取消']
+                ,yes:function () {
+                    var password1 = $("#password").val();
+                    if (password==password1){
+                        $.ajax({
+                            url:"http://localhost:8080/acc/insertone.do?accountId="+id,
+                            type:"post",
+                            data:data,
+                            dataType:"json",
+                            async: false,
+                            xhrFields:{
+                                withCredentials:true
+                            },
+                            success:function (rec) {
                                 if (rec.code==0) {
                                     layer.msg(rec.msg, function () {
-                                    window.location.reload()
-                                }); }else{
+                                        window.location.reload()
+                                    }); }else{
                                     //认证不成功
                                     layer.msg(rec.msg);
                                 }
                             }
-                            if (password!=password1){
-                                layer.msg('密码不正确！');
-                                return false;
-                            }
-
-                        }
-
-                    })
-
+                        })
+                        return false;
+                    }
+                    if (password!=password1){
+                        layer.msg('密码不正确！');
+                        return false;
+                    }
+                    return false;
                 }
+
             })
-            return false;
+
+
+
         });
 
     })

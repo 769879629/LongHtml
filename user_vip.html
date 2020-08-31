@@ -14,7 +14,7 @@
     <div class="layuimini-main">
 
         <div class="demoTable">
-            搜索ID：
+            搜索用户名：
             <div class="layui-inline">
                 <input class="layui-input" name="username" id="demoReload" autocomplete="off">
             </div>
@@ -28,6 +28,7 @@
 
         <script type="text/html" id="currentTableBar">
             <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-submit lay-filter="modify" lay-event="delete">审核</a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-submit lay-filter="edit" lay-event="ss">删除</a>
         </script>
 
     </div>
@@ -58,6 +59,8 @@
                 id=rec.data.id;
             }
         })
+
+
         table.render({
             elem: '#currentTableId',
             url: 'http://localhost:8080/user/findOfficialbyRid2.do?referId='+id,
@@ -181,7 +184,35 @@
                 });
 
 
-            }
+            } else if (obj.event === 'ss') {
+             form.on('submit(edit)', function () {
+                 $.ajax({
+                     url:"http://localhost:8080/user/remove.do?id="+data.id,
+                     data:queryString,
+                     type:"post",
+                     dataType:"json",
+                     async: false,
+                     xhrFields:{
+                         withCredentials:true
+                     },
+                     success:function (rec) {
+
+                         layer.msg(rec.msg);
+                         layui.use('layer', function(){
+                             var layer = layui.layer;
+                             layer.alert("用户删除成功！",
+                                 function () {
+                                     window.parent.location.reload();//刷新父页面
+                                 }
+                             );
+                         });
+
+                     }
+                 })
+
+                 return false;
+             });
+         }
         });
 
     });

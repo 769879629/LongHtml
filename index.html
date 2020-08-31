@@ -63,14 +63,17 @@
 						<li class="layui-nav-item mobile layui-hide-xs" lay-unselect>
 							<a href="javascript:;" data-check-screen="full"><i class="fa fa-arrows-alt"></i></a>
 						</li>
+						<li class="layui-nav-item" lay-unselect>
+							<a href="javascript:;" id="vip"></a>
+						</li>
 						<li class="layui-nav-item layuimini-setting">
 							<a href="javascript:;" id="sessionUser"></a>
 							<dl class="layui-nav-child">
 								<dd>
-									<a href="javascript:;" layuimini-content-href="page/user-setting.html" data-title="基本资料" data-icon="fa fa-gears">基本资料<span class="layui-badge-dot"></span></a>
+									<a href="javascript:;" layuimini-content-href="user_information.html" data-title="基本资料" data-icon="fa fa-gears">基本资料<span class="layui-badge-dot"></span></a>
 								</dd>
 								<dd>
-									<a href="javascript:;" layuimini-content-href="page/user-password.html" data-title="修改密码" data-icon="fa fa-gears">修改密码</a>
+									<a href="javascript:;" layuimini-content-href="user_password.html" data-title="修改密码" data-icon="fa fa-gears">修改密码</a>
 								</dd>
 								<dd>
 									<hr>
@@ -159,12 +162,14 @@
 					success: function(rec) {
 						//当前用户不存在
 						if(rec.code == 1) {
-							layer.alert(rec.msg, function(index) {
-								window.location = "login.html";
-								layer.close(index);
-							});
+
+                            layer.alert(rec.msg, function(index) {
+								window.location.href="http://localhost:8080/login"
+                                layer.close(index);
+                            });
 						} else {
 							$("#sessionUser").html(rec.data.username);
+							$("#vip").html(rec.data.roleName);
 							var options = {
 								iniUrl: "api/init.json", // 初始化接口
 								clearUrl: "api/clear.json", // 缓存清理接口
@@ -194,25 +199,10 @@
 				});
 
 				$('.login-out').on("click", function() {
-
-                    $.ajax({
-                        url: "http://localhost:8080/logout.do",
-                        type: "post",
-                        dataType: "json",
-                        xhrFields: {
-                            // 发送 AJAX 请求时带上 cookie
-                            withCredentials: true
-                        },
-                        success: function(rec) {
-                            if (rec.code==0){
-                                layer.msg(rec.msg, function() {
-                                    window.location = 'login.html';
-                                });
-                            } else {
-                                layer.msg(rec.msg);
-							}
-                        }
-                    })
+                    layer.alert("退出成功", function(index) {
+                        window.location.href="http://localhost:8080/logout"
+                        layer.close(index);
+                    });
 				});
 			});
 		</script>

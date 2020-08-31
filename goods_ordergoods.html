@@ -13,13 +13,13 @@
 <div class="layuimini-container">
     <div class="layuimini-main">
 
-        <div class="demoTable">
-            搜索商品名：
-            <div class="layui-inline">
-                <input class="layui-input" name="goodsName" id="demoReload" autocomplete="off">
-            </div>
-            <button class="layui-btn" data-type="reload">搜索</button>
-        </div>
+        <!--<div class="demoTable">-->
+            <!--搜索商品名：-->
+            <!--<div class="layui-inline">-->
+                <!--<input class="layui-input" name="goodsName" id="demoReload" autocomplete="off">-->
+            <!--</div>-->
+            <!--<button class="layui-btn" data-type="reload">搜索</button>-->
+        <!--</div>-->
 
 
 
@@ -37,10 +37,23 @@
         var $ = layui.jquery,
             form = layui.form,
             table = layui.table;
+var userId="";
+        $.ajax({
+            url: "http://localhost:8080/session.do",
+            type: "post",
+            dataType: "json",
+            async: false,
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(rec) {
+                userId = rec.data.id;
+            }
 
+        })
         table.render({
             elem: '#currentTableId',
-            url: 'http://localhost:8080/order/findlist.do',
+            url: 'http://localhost:8080/io/findAll.do?userId='+userId,
             toolbar: '#toolbarDemo',
             defaultToolbar: ['filter', 'exports', 'print', {
                 title: '提示',
@@ -50,122 +63,29 @@
             parseData:function(res){//res 即为原始返回的数据
                 console.log(res)
                 return {
-                    "code":0,
-                    "msg":"",
-                    "count":5,
-                    data:res
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data.list,
+                    id: res.data.list.id
                 };
             },
             cols: [[
-                {field: 'goodsName', width: 120, title: '商品名称', sort: true},
-                {field: 'goodsPrice', width: 100, title: '价格'},
-                {field: 'goodsNum', width: 120,edit: 'num',  title: '商品数量'},
-                {field: 'createBy', width: 120, title: '下单人'},
-                {field: 'totalprice', width: 120,edit: 'num',  title: '商品总价',templet:function (d) {
-                        return  parseInt(d.goodsPrice)*parseInt(d.goodsNum)
-                    }},
-                // {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
-            ]],
+                {field: 'orderCode',  title: '商品名称', sort: true},
+                {field: 'orderPrice', title: '支付金额'},
+                {field: 'createTime', title: '下单时间'},
+                {field: 'status',   title: '支付情况',templet:function (rec) {
+                    if (rec.status=="1"){
+                        return "已支付"
+                    }
+                    }}
+            ]],limits: [1, 5, 10, 15, 20, 30],
+            limit: 5,
+            page: true,
+            skin: 'line'
 
         });
 
-
-        $('.demoTable .layui-btn').on('click', function(){
-
-            var search = $("input[name='goodsName']").val();
-            table.render({
-                elem:'#currentTableId'
-                ,url:'http://localhost:8080/order/findgoodsName.do?goodsName='+search
-                , parseData:function(res){//res 即为原始返回的数据
-                    console.log(res)
-                    return {
-                        "code":0,
-                        "msg":"",
-                        "count":5,
-                        data:res};
-                }, cols: [[
-                    {field: 'goodsName', width: 120, title: '商品名称', sort: true},
-                    {field: 'goodsPrice', width: 100, title: '价格'},
-                    {field: 'goodsNum', width: 120,edit: 'num',  title: '商品数量'},
-                    {field: 'createBy', width: 120, title: '下单人'},
-                    {field: 'totalprice', width: 120,edit: 'num',  title: '商品总价',templet:function (d) {
-                            return  parseInt(d.goodsPrice)*parseInt(d.goodsNum)
-                        }},
-                    // {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
-                ]],
-                limits: [10, 15, 20, 25, 50, 100],
-                limit: 15,
-                page: true,
-                skin: 'line'
-            })
-        })
-
-        /**
-         * toolbar监听事件
-         */
-        table.on('toolbar(currentTableFilter)', function (obj) {
-            if (obj.event === 'add') {  // 监听添加操作
-                var index = layer.open({
-                    title: '添加用户',
-                    type: 2,
-                    shade: 0.2,
-                    maxmin:true,
-                    shadeClose: true,
-                    area: ['100%', '100%'],
-                    content: 'goods_add.html',
-                });
-                $(window).on("resize", function () {
-                    layer.full(index);
-                });
-            } else if (obj.event === 'delete') {  // 监听删除操作
-                var checkStatus = table.checkStatus('currentTableId')
-                    , data = checkStatus.data;
-                layer.alert(JSON.stringify(data));
-            }
-        });
-
-        //监听表格复选框选择
-        table.on('checkbox(currentTableFilter)', function (obj) {
-            console.log(obj)
-        });
-
-        table.on('tool(currentTableFilter)', function (obj) {
-            var data = obj.data;
-            console.log("data="+data.id)
-            console.log("datanum="+data.num)
-            if (obj.event === 'delete') {
-                form.on('submit(modify)', function ( ) {
-                    $.ajax({
-                        url:"http://localhost:8080/user/modifynum.do?num="+data.num+"&id="+data.id,
-                        type:"post",
-                        data:data,
-                        dataType:"json",
-                        async: false,
-                        xhrFields:{
-                            withCredentials:true
-                        },
-                        success:function (rec) {
-
-                            layer.msg(rec.msg);
-                            layui.use('layer', function(){
-                                var layer = layui.layer;
-                                layer.alert("已添加到购物车！",
-                                    function () {
-                                        window.parent.location.reload();//刷新父页面
-                                        parent.layer.close(index);//关闭当前的弹窗
-                                    }
-                                );
-                            });
-
-                        }
-                    })
-
-                    return false;
-                });
-
-
-            }
-        });
 
     });
 </script>

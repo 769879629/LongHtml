@@ -10,43 +10,59 @@
     <link rel="stylesheet" href="css/public.css" media="all">
     <style>
         .layui-form-item .layui-input-company {width: auto;padding-right: 10px;line-height: 38px;}
+        .width50{
+            width:150px;}
+        .width10{
+            width:150px;
+            height: 150px;
+        }
     </style>
 </head>
 <body>
 <div class="layui-form layuimini-form">
     <div class="layui-form-item">
+    <label class="layui-form-label">留言详情：</label>
+    </div>
+    <div class="layui-form-item">
         <label class="layui-form-label required">标题</label>
         <div class="layui-input-block">
-            <input type="text" name="messageTitle" lay-verify="required" lay-reqtext="用户名不能为空" placeholder="请输入用户名" value="" class="layui-input">
+            <input type="text" name="messageTitle"   readonly="readonly" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">内容</label>
         <div class="layui-input-block">
-            <input type="text" name="messageContent" lay-verify="required" lay-reqtext="用户名不能为空" placeholder="请输入用户名" value="" class="layui-input">
+            <textarea type="text" name="messageContent" readonly="readonly" value="" class="layui-input width10"></textarea>
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">留言人</label>
         <div class="layui-input-block">
-            <input type="email" name="createdBy" placeholder="请填写昵称" value="" class="layui-input">
+            <input type="email" name="createdBy" readonly="readonly" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确定返回</button>
-        </div>
+    <label  class="layui-form-label">回复详情：</label>
     </div>
+    <div class="layui-input-block">
+        <table class="layui-hide " id="currentTableId"   lay-filter="currentTableFilter"></table>
+    </div>
+    <!--<div class="layui-form-item">-->
+        <!--<div class="layui-input-block">-->
+            <!--<button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确定返回</button>-->
+        <!--</div>-->
+    <!--</div>-->
 </div>
 <script src="lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
 <script src="js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 
 <script>
 
-    layui.use(['layer', 'form','jquery'], function () {
+    layui.use(['layer', 'form','jquery','table'], function () {
         var form = layui.form;
         var $ = layui.jquery;
-        var layer = layui.layer;
+        var layer = layui.layer,
+            table = layui.table;
         var queryString=window.location.search.substring(1);
 
 
@@ -63,11 +79,41 @@
             success:function (rec) {
 
                 $("input[name='messageTitle']").val(rec.messageTitle);
-                $("input[name='messageContent']").val(rec.messageContent);
+                $("textarea[name='messageContent']").val(rec.messageContent);
                 $("input[name='createdBy']").val(rec.createdBy);
             }
         })
 
+        table.render({
+            elem: '#currentTableId',
+            url: 'http://localhost:8080/reply/find.do?messageId='+queryString.substring(3),
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            width : 1200,
+            parseData:function(res){//res 即为原始返回的数据
+                console.log(res)
+                return {
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data.list,
+                    "id": res.data.list.id
+                };
+            },
+            cols: [[
+                {field: 'id', title: 'ID', sort: true},
+                {field: 'replyContent',  title: '回复内容', sort: true},
+                {field: 'createdBy',  title: '回复人'},
+                {field: 'createTime',   title: '回复时间'},
+            ]],
+            limits: [1, 5, 10, 15, 20, 30],
+            limit: 5,
+            page: false,
+            skin: 'line'
+        });
 
         form.on('submit(saveBtn)', function (data) {
             data = data.field;

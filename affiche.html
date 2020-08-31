@@ -8,23 +8,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="lib/layui-v2.5.5/css/layui.css" media="all">
     <link rel="stylesheet" href="css/public.css" media="all">
+    <style>
+        .width50{
+            width: 150px;
+        }
+    </style>
 </head>
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
-
-
-
         <script type="text/html" id="toolbarDemo">
-            <div class="layui-btn-container">
-                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加 </button>
+            <div class="layui-btn-container" id="add">
             </div>
         </script>
-
         <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
-
-
-
     </div>
 </div>
 
@@ -37,10 +34,28 @@
             table = layui.table;
         var queryString=window.location.search.substring(1);
 
+        $.ajax({
+            url:"http://localhost:8080/session.do",
+            type: "post",
+            dataType: "json",
+            xhrFields: {
+                // 发送 AJAX 请求时带上 cookie
+                withCredentials: true
+            },
+            success:function (rec) {
+                if (rec.data.roleId==1){
+                    $("#add").html(" <button class=\"layui-btn layui-btn-normal layui-btn-sm data-add-btn\" lay-event=\"add\"> 添加 </button>")
+                }
+                if (rec.data.roleId!=1) {
+                    $("#delete").hide();
+                }
+            }
+        })
+
 
         table.render({
             elem: '#currentTableId',
-            url: 'http://localhost:8080/aff/findFive.do',
+            url: 'http://localhost:8080/aff/findAll.do',
             toolbar: '#toolbarDemo',
             defaultToolbar: ['filter', 'exports', 'print', {
                 title: '提示',
@@ -50,20 +65,21 @@
             parseData:function(res){//res 即为原始返回的数据
                 console.log(res)
                 return {
-                    "code":0,
-                    "msg":"",
-                    "count":5,
-                    data:res
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data.list,
+                    "id": res.data.list.id
                 };
             },cols: [[ //表头
-                {field: 'title', title: '标题',sort: true,align:'center'}
-                ,{field: 'content', title: '内容',sort: true,align:'center'}
-                ,{field: 'publisher', title: '发布人',sort: true,align:'center'}
+                {field: 'title', title: '标题',align:'center'}
+                ,{field: 'content', title: '内容',align:'center'}
+                ,{field: 'publisher', title: '发布人',align:'center'}
                 ,{field: 'publishTime', title: '发布时间',sort: true,align:'center'}
-                ,{title: '操作',toolbar:"#currentTableBar",sort: true,align:'center'}
+                ,{title: '操作',toolbar:"#currentTableBar",align:'center'}
             ]],
-            limits: [10, 15, 20, 25, 50, 100],
-            limit: 15,
+            limits: [1, 5, 10, 15, 20, 30],
+            limit: 5,
             page: true,
             skin: 'line'
         });
@@ -87,17 +103,7 @@
                 $(window).on("resize", function () {
                     layer.full(index);
                 });
-            } else if (obj.event === 'delete') {  // 监听删除操作
-                var checkStatus = table.checkStatus('currentTableId')
-                    , data = checkStatus.data;
-                layer.alert(JSON.stringify(data));
-            }
-        });
-
-        //监听表格复选框选择
-        table.on('checkbox(currentTableFilter)', function (obj) {
-            console.log(obj)
-        });
+            }  });
 
         table.on('tool(currentTableFilter)', function (obj) {
             var data = obj.data;
@@ -118,9 +124,7 @@
                 });
                 return false;
             } else if (obj.event === 'delete') {
-
                 form.on('submit(modify)', function () {
-
                     $.ajax({
                         url:"http://localhost:8080/aff/remove.do?id="+data.id,
                         type:"post",
@@ -132,13 +136,19 @@
                         success:function (rec) {
                             layer.msg(rec.msg);
                             layui.use('layer', function(){
-                                var layer = layui.layer;
-                                layer.alert("删除成功！",
-                                    function () {
-                                        window.parent.location.reload();//刷新父页面
-                                        parent.layer.close(index);//关闭当前的弹窗
+                                console.log(data)
+                                layer.msg(rec.msg);
+                                layui.use('layer', function(){
+                                    if (rec.code==0){
+                                        layer.alert(rec.msg,
+                                            function () {
+                                                window.parent.location.reload();//刷新父页面
+                                            }
+                                        );
+                                    } else {
+                                        layer.msg(rec.msg);
                                     }
-                                );
+                                });
                             });
 
                         }
@@ -146,16 +156,15 @@
 
                     return false;
                 });
-
-
             }
         });
 
     });
+
 </script>
 <script type="text/html" id="currentTableBar">
     <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">查看</a>
-    <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-submit lay-filter="modify" lay-event="delete">删除</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-submit lay-filter="modify" id="delete" lay-event="delete">删除</a>
 </script>
 </body>
 </html>

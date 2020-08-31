@@ -14,7 +14,7 @@
     <div class="layuimini-main">
 
         <div class="demoTable">
-            搜索ID：
+            搜索用户名：
             <div class="layui-inline">
                 <input class="layui-input" name="username" id="demoReload" autocomplete="off">
             </div>
@@ -26,6 +26,8 @@
 
         <script type="text/html" id="currentTableBar">
             <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-submit lay-filter="modify"
+               lay-event="update">审核</a>
             <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-submit lay-filter="modify"
                lay-event="delete">锁定</a>
         </script>
@@ -208,6 +210,37 @@
                             layui.use('layer', function () {
                                 var layer = layui.layer;
                                 layer.alert("用户锁定成功！",
+                                    function () {
+                                        window.parent.location.reload();//刷新父页面
+                                        parent.layer.close(index);//关闭当前的弹窗
+                                    }
+                                );
+                            });
+
+                        }
+                    })
+
+                    return false;
+                });
+
+
+            }else if (obj.event === 'update') {
+
+                form.on('submit(modify)', function () {
+                    $.ajax({
+                        url: "http://localhost:8080/user/modifyisStart1.do?id=" + data.id,
+                        type: "post",
+                        dataType: "json",
+                        async: false,
+                        xhrFields: {
+                            withCredentials: true
+                        },
+                        success: function (rec) {
+
+                            layer.msg(rec.msg);
+                            layui.use('layer', function () {
+                                var layer = layui.layer;
+                                layer.alert("用户审核成功！",
                                     function () {
                                         window.parent.location.reload();//刷新父页面
                                         parent.layer.close(index);//关闭当前的弹窗

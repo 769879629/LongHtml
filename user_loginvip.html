@@ -8,13 +8,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="lib/layui-v2.5.5/css/layui.css" media="all">
     <link rel="stylesheet" href="css/public.css" media="all">
+    <style>
+        .width50 {
+            width: 200px;
+        }
+    </style>
 </head>
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
 
         <div class="demoTable">
-            搜索ID：
+            搜索用户名：
             <div class="layui-inline">
                 <input class="layui-input" name="username" id="demoReload" autocomplete="off">
             </div>
@@ -24,53 +29,82 @@
 
         <script type="text/html" id="toolbarDemo">
             <div class="layui-btn-container" id="add">
-             </div>
+            </div>
         </script>
 
         <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
 
         <script type="text/html" id="currentTableBar">
             <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
-            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-submit lay-filter="modify" lay-event="delete">删除</a>
-            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-submit lay-filter="modify" lay-event="delete1">密码重置</a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-submit lay-filter="modify"
+               lay-event="delete1">密码重置</a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" id="sc" lay-submit lay-filter="modify"  lay-event="delete">删除</a>
         </script>
 
     </div>
 </div>
 <script src="lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script src="js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 <script>
     layui.use(['form', 'table'], function () {
         var $ = layui.jquery,
             form = layui.form,
             table = layui.table;
-        var queryString=window.location.search.substring(1);
+        var queryString = window.location.search.substring(1);
+        var roleId="";
+        var id=""
 
         $.ajax({
-            url:"http://localhost:8080/session.do",
+            url: "http://localhost:8080/session.do",
             type: "post",
             dataType: "json",
+            async: false,
             xhrFields: {
                 // 发送 AJAX 请求时带上 cookie
                 withCredentials: true
             },
-            success:function (rec) {
-                if (rec.data.roleId==1){
+            success: function (rec) {
+
+                id = rec.data.id;
+                roleId = rec.data.roleId;
+                if (rec.data.roleId == 1) {
                     $("#add").html(" <button class=\"layui-btn layui-btn-normal layui-btn-sm data-add-btn\" lay-event=\"add\"> 添加 </button>")
                 }
+
             }
         })
 
 
+        $.ajax({
+            url: "http://localhost:8080/role/page.do",
+            type: "post",
+            dataType: "json",
+            async: false,
+            xhrFields: {
+                // 发送 AJAX 请求时带上 cookie
+                withCredentials: true
+            },
+            success: function (rec) {
+                if (roleId < 3) {
+                } else {
+                    layer.msg(rec.msg)
+                }
+            },
+            error: function () {
+                layer.msg("error")
+            }
+        })
         table.render({
             elem: '#currentTableId',
-            url: 'http://localhost:8080/user/findlogin.do',
+            url: 'http://localhost:8080/user/findlogin.do?referId='+id,
             toolbar: '#toolbarDemo',
             defaultToolbar: ['filter', 'exports', 'print', {
                 title: '提示',
                 layEvent: 'LAYTABLE_TIPS',
                 icon: 'layui-icon-tips'
             }],
-            parseData:function(res){//res 即为原始返回的数据
+            parseData: function (res) {//res 即为原始返回的数据
                 console.log(res)
                 return {
                     "code": res.code,
@@ -81,21 +115,23 @@
                 };
             },
             cols: [[
-                {type: "checkbox" },
-                {field: 'username' , title: '用户名'},
-                {field: 'realName' , title: '真实姓名'},
-                {field: 'sex' , title: '性别', sort: true},
-                {field: 'mobile',   title: '手机'},
-                {field: 'roleName' , title: '会员名称'},
-                {field: 'isStart', title: '是否启用' ,templet: function (item) {
+                {type: "checkbox"},
+                {field: 'username', title: '用户名'},
+                {field: 'realName', title: '真实姓名'},
+                {field: 'sex', title: '性别', sort: true},
+                {field: 'mobile', title: '手机'},
+                {field: 'roleName', title: '会员名称'},
+                {
+                    field: 'isStart', title: '是否启用', templet: function (item) {
                         if (item.isStart == 1) {
                             return "已启用";
                         } else if (item.isStart == 0) {
                             return "未启用";
-                        }}
+                        }
+                    }
                 },
-                {field: 'createTime', title: '注册时间' , sort: true},
-                {title: '操作' , toolbar: '#currentTableBar', align: "center"}
+                {field: 'createTime', title: '注册时间', sort: true},
+                {title: '操作', toolbar: '#currentTableBar', align: "center"}
             ]],
             limits: [1, 5, 10, 15, 20, 30],
             limit: 5,
@@ -104,13 +140,13 @@
         });
 
         // 搜索
-        $('.demoTable .layui-btn').on('click', function(){
+        $('.demoTable .layui-btn').on('click', function () {
 
-            var  search = $("input[name='username']").val();
+            var search = $("input[name='username']").val();
             table.render({
-                elem:'#currentTableId'
-                ,url:'http://localhost:8080/user/findusername.do?username='+search
-                , parseData:function(res){//res 即为原始返回的数据
+                elem: '#currentTableId'
+                , url: 'http://localhost:8080/user/findusername.do?username=' + search
+                , parseData: function (res) {//res 即为原始返回的数据
                     console.log(res)
                     return {
                         "code": res.code,
@@ -120,21 +156,23 @@
                         "id": res.data.list.id
                     };
                 }, cols: [[
-                    {type: "checkbox" },
-                    {field: 'username' , title: '用户名'},
-                    {field: 'realName' , title: '真实姓名'},
-                    {field: 'sex' , title: '性别', sort: true},
-                    {field: 'mobile',   title: '手机'},
-                    {field: 'roleName' , title: '会员名称'},
-                    {field: 'isStart', title: '是否启用' ,templet: function (item) {
+                    {type: "checkbox"},
+                    {field: 'username', title: '用户名'},
+                    {field: 'realName', title: '真实姓名'},
+                    {field: 'sex', title: '性别', sort: true},
+                    {field: 'mobile', title: '手机'},
+                    {field: 'roleName', title: '会员名称'},
+                    {
+                        field: 'isStart', title: '是否启用', templet: function (item) {
                             if (item.isStart == '1') {
                                 return "已启用";
                             } else if (item.isStart == '0') {
                                 return "未启用";
-                            }}
+                            }
+                        }
                     },
-                    {field: 'createTime', title: '注册时间' , sort: true},
-                    {title: '操作' , toolbar: '#currentTableBar', align: "center"}
+                    {field: 'createTime', title: '注册时间', sort: true},
+                    {title: '操作', toolbar: '#currentTableBar', align: "center"}
                 ]],
                 limits: [1, 5, 10, 15, 20, 30],
                 limit: 5,
@@ -152,7 +190,7 @@
                     title: '添加用户',
                     type: 2,
                     shade: 0.2,
-                    maxmin:true,
+                    maxmin: true,
                     shadeClose: true,
                     area: ['100%', '100%'],
                     content: 'user_add.html',
@@ -174,17 +212,18 @@
 
         table.on('tool(currentTableFilter)', function (obj) {
             var data = obj.data;
-            console.log("data="+data.id)
+            console.log("data=" + data.id)
+            console.log("datadata=" + data.isStart)
             if (obj.event === 'edit') {
 
                 var index = layer.open({
                     title: '编辑用户',
                     type: 2,
                     shade: 0.2,
-                    maxmin:true,
+                    maxmin: true,
                     shadeClose: true,
                     area: ['100%', '100%'],
-                    content: 'user_edit.html?id='+data.id,
+                    content: 'user_edit.html?id=' + data.id,
                 });
                 $(window).on("resize", function () {
                     layer.full(index);
@@ -193,18 +232,23 @@
             } else if (obj.event === 'delete') {
 
                 form.on('submit(modify)', function () {
-                    $.ajax({
-                        url:"http://localhost:8080/user/remove.do?id="+data.id,
-                        type:"post",
-                        data:queryString,
-                        dataType:"json",
-                        xhrFields:{
-                            withCredentials:true
-                        },
-                        success:function (rec) {
 
+
+                    $.ajax({
+                        url: "http://localhost:8080/user/remove.do?id=" + data.id,
+                        type: "post",
+                        data: queryString,
+                        dataType: "json",
+                        xhrFields: {
+                            withCredentials: true
+                        },
+                        success: function (rec) {
+                            if (data.isStart==1){
+                                layer.alert("已启用用户不能删除！")
+                                return false;
+                            }
                             layer.msg(rec.msg);
-                            layui.use('layer', function(){
+                            layui.use('layer', function () {
                                 var layer = layui.layer;
                                 layer.alert("用户已删除！",
                                     function () {
@@ -220,22 +264,24 @@
                 });
 
 
-            }else if (obj.event === 'delete1') {
+            } else if (obj.event === 'delete1') {
 
                 form.on('submit(modify)', function () {
 
+
+
                     $.ajax({
-                        url:"http://localhost:8080/user/modifypwd1.do?id="+data.id,
-                        type:"post",
-                        data:queryString,
-                        dataType:"json",
-                        xhrFields:{
-                            withCredentials:true
+                        url: "http://localhost:8080/user/modifypwd1.do?id=" + data.id,
+                        type: "post",
+                        data: queryString,
+                        dataType: "json",
+                        xhrFields: {
+                            withCredentials: true
                         },
-                        success:function (rec) {
+                        success: function (rec) {
 
                             layer.msg(rec.msg);
-                            layui.use('layer', function(){
+                            layui.use('layer', function () {
                                 var layer = layui.layer;
                                 layer.alert("密码已重置！",
                                     function () {

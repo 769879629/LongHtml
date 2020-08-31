@@ -91,6 +91,27 @@
         var queryString = window.location.search.substring(1);
         var id="";
 
+        $.ajax({
+            url:"http://localhost:8080/role/page.do",
+            type:"post",
+            dataType:"json",
+            async: false,
+            xhrFields:{
+                // 发送 AJAX 请求时带上 cookie
+                withCredentials:true
+            },
+            success:function (rec) {
+
+                if(rec.code==0){
+                }else{
+                    layer.msg(rec.msg)
+                }
+
+            },
+            error:function(){
+                layer.msg("error")
+            }
+        })
 
         $.ajax({
             url: "http://localhost:8080/session.do",
@@ -118,7 +139,6 @@
             },
             page:false,
             success:function (res) {
-                console.log("++++"+res.data)
                     for(var i =0;i<res.data.list.length;i++){
                         $("#referId").append("<option value=\""+res.data.list[i].id+"\">"+res.data.list[i].username+"</option>");
                     }

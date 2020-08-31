@@ -12,6 +12,9 @@
         body {
             background-color: #ffffff;
         }
+        .width50{
+            width: 150px;
+        }
     </style>
 </head>
 <body>
@@ -19,36 +22,36 @@
     <div class="layui-form-item">
         <label class="layui-form-label required">商品编码</label>
         <div class="layui-input-block">
-            <input type="text" name="goodsSN" lay-verify="required" lay-reqtext="不能为空" placeholder="请输入编码" value="" class="layui-input">
+            <input type="text" name="goodsSN" lay-verify="required" lay-reqtext="不能为空" placeholder="请输入编码" value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">商品名称</label>
         <div class="layui-input-block">
-            <input type="text" name="goodsName" lay-verify="required" lay-reqtext="不能为空" placeholder="请输入名称" value="" class="layui-input">
+            <input type="text" name="goodsName" lay-verify="required" lay-reqtext="不能为空" placeholder="请输入名称" value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">商品规格</label>
         <div class="layui-input-block">
-            <input type="text" name="goodsFormat" lay-verify="required"  value="" class="layui-input">
+            <input type="text" name="goodsFormat" lay-verify="required"  value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">市场价</label>
         <div class="layui-input-block">
-            <input type="email" name="marketPrice" placeholder="市场价" value="" class="layui-input">
+            <input type="email" name="marketPrice" placeholder="市场价" value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">优惠价</label>
         <div class="layui-input-block">
-            <input type="email" name="realPrice" placeholder="优惠价" value="" class="layui-input">
+            <input type="email" name="realPrice" placeholder="优惠价" value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">状态</label>
-        <div class="layui-input-block">
+        <div class="layui-input-block width50">
             <input type="radio" name="state" value="1" title="上架" checked="">
             <input type="radio" name="state" value="2" title="下架">
         </div>
@@ -56,29 +59,28 @@
     <div class="layui-form-item">
         <label class="layui-form-label">商品说明</label>
         <div class="layui-input-block">
-            <input type="text" name="note" placeholder="商品说明" value="" class="layui-input">
+            <input type="text" name="note" placeholder="商品说明" value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">库存</label>
         <div class="layui-input-block">
-            <input type="number" name="num" placeholder="库存" value="" class="layui-input">
+            <input type="number" name="num" placeholder="库存" value="" class="layui-input width50">
             <tip>只能为数字。</tip>
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">单位</label>
         <div class="layui-input-block">
-            <input type="text" name="unit" placeholder="单位" value="" class="layui-input">
+            <input type="text" name="unit" placeholder="单位" value="" class="layui-input width50">
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">创建人</label>
+        <label class="layui-form-label required">创建人</label>
         <div class="layui-input-block">
-            <input type="text" name="createdBy" placeholder="创建人" value="" class="layui-input">
+            <input type="text" name="createdBy" id="createdBy" value="" readonly="readonly" class="layui-input width50">
         </div>
     </div>
-
 
     <div class="layui-form-item">
         <div class="layui-input-block">
@@ -105,6 +107,7 @@
             success: function(rec) {
                 id = rec.data.id;
                 console.log("modifyid="+id);
+
             }
 
         })
@@ -116,7 +119,8 @@
                 withCredentials:true
             },
             success:function (rec) {
-                $("input[name='createdBy']").val(rec.username);
+
+                $("input[name='createdBy']").val(rec.data.username);
             }
         })
 

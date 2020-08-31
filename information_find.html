@@ -16,8 +16,8 @@
 
 
         <script type="text/html" id="toolbarDemo">
-            <div class="layui-btn-container">
-                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加 </button>
+            <div class="layui-btn-container" id="add">
+
             </div>
         </script>
 
@@ -39,6 +39,26 @@
         var queryString=window.location.search.substring(1);
 
 
+        $.ajax({
+            url:"http://localhost:8080/session.do",
+            type: "post",
+            dataType: "json",
+            xhrFields: {
+                // 发送 AJAX 请求时带上 cookie
+                withCredentials: true
+            },
+            success:function (rec) {
+                if (rec.data.roleId==1){
+                    $("#add").html(" <button class=\"layui-btn layui-btn-normal layui-btn-sm data-add-btn\" lay-event=\"add\"> 添加 </button>")
+                }
+                if (rec.data.roleId!=1) {
+                    $("#delete").hide();
+                }
+            }
+        })
+
+
+
         table.render({
             elem: '#currentTableId',
             url: 'http://localhost:8080/inf/findlist.do',
@@ -51,32 +71,33 @@
             parseData:function(res){//res 即为原始返回的数据
                 console.log(res)
                 return {
-                    "code":0,
-                    "msg":"",
-                    "count":5,
-                    data:res
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data.list,
+                    "id": res.data.list.id
                 };
             },
             cols: [[
-                {field: 'title', width: 80, title: '标题', sort: true},
-                {field: 'content', width: 80, title: '内容', sort: true},
-                {field: 'state', width: 80, title: '发布状态',templet: function (item) {
+                {field: 'title', title: '标题',  },
+                {field: 'content', title: '内容',  },
+                {field: 'state', title: '发布状态',templet: function (item) {
                         if (item.state == '0') {
                             return "未发布";
                         } else if (item.state == '1') {
                             return "已发布";
                         }}},
-                {field: 'publisher', width: 90, title: '发布人'},
-                {field: 'publishTime', width: 80, title: '发送时间'},
-                {field: 'typeName', width: 100, title: '附件类型'},
-                {field: 'fileName', width: 100, title: '附件名称'},
-                {field: 'filePath', width: 100, title: '附件存放路径'},
-                {field: 'fileSize', width: 100, title: '附件大小'},
-                {field: 'uploadTime', title: '上传时间', width: 120, sort: true},
-                {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
+                {field: 'publisher', title: '发布人'},
+                {field: 'publishTime', title: '发送时间'},
+                {field: 'typeName', title: '附件类型'},
+                {field: 'fileName',title: '附件名称'},
+                {field: 'filePath',title: '附件存放路径'},
+                {field: 'fileSize', title: '附件大小'},
+                {field: 'uploadTime', title: '上传时间',sort: true},
+                {title: '操作',toolbar: '#currentTableBar', align: "center"}
             ]],
-            limits: [10, 15, 20, 25, 50, 100],
-            limit: 15,
+            limits: [1, 5, 10, 15, 20, 30],
+            limit: 5,
             page: true,
             skin: 'line'
         });
@@ -144,17 +165,12 @@
                             withCredentials:true
                         },
                         success:function (rec) {
-
-                            layer.msg(rec.msg);
-                            layui.use('layer', function(){
-                                var layer = layui.layer;
-                                layer.alert("删除成功！",
-                                    function () {
-                                        window.parent.location.reload();//刷新父页面
-                                        parent.layer.close(index);//关闭当前的弹窗
-                                    }
-                                );
-                            });
+                            if (rec.code == 0) {
+                                alert(rec.msg)
+                                window.parent.location.reload();
+                            }else {
+                                alert(rec.msg)
+                            }
 
                         }
                     })

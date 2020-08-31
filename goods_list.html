@@ -14,7 +14,7 @@
     <div class="layuimini-main">
 
         <div class="demoTable">
-            搜索ID：
+            搜索商品：
             <div class="layui-inline">
                 <input class="layui-input" name="goodsName" id="demoReload" autocomplete="off">
             </div>
@@ -24,14 +24,16 @@
 
         <script type="text/html" id="toolbarDemo">
             <div class="layui-btn-container">
-                 <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 添加商品 </button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 添加商品
+                </button>
             </div>
         </script>
 
         <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
 
         <script type="text/html" id="currentTableBar">
-            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-submit lay-filter="modify" lay-event="delete">添加购物车</a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-submit lay-filter="modify"
+               lay-event="delete">添加购物车</a>
         </script>
 
     </div>
@@ -42,7 +44,20 @@
         var $ = layui.jquery,
             form = layui.form,
             table = layui.table;
-        var queryString=window.location.search.substring(1);
+        var queryString = window.location.search.substring(1);
+        var username = "";
+        $.ajax({
+            url: "http://localhost:8080/session.do",
+            type: "post",
+            dataType: "json",
+            xhrFields: {
+                // 发送 AJAX 请求时带上 cookie
+                withCredentials: true
+            },
+            success: function (rec) {
+                username = rec.data.username;
+            }
+        })
 
 
         table.render({
@@ -54,71 +69,82 @@
                 layEvent: 'LAYTABLE_TIPS',
                 icon: 'layui-icon-tips'
             }],
-            parseData:function(res){//res 即为原始返回的数据
+            parseData: function (res) {//res 即为原始返回的数据
                 console.log(res)
                 return {
-                    "code":0,
-                    "msg":"",
-                    "count":5,
-                    data:res
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data.list,
+                    id: res.data.list.id
                 };
             },
             cols: [[
-                {type: "checkbox", width: 50},
-                {field: 'goodsName', width: 120, title: '商品名称', sort: true},
-                {field: 'goodsFormat', width: 100, title: '商品规格'},
-                {field: 'marketPrice', width: 100, title: '市场价'},
-                {field: 'realPrice', width:120, title: '优惠价格',sort: true},
-                {field: 'state', width: 80, title: '状态',templet: function (item) {
+                {type: "checkbox",},
+                {field: 'goodsName', title: '商品名称', sort: true},
+                {field: 'goodsFormat', title: '商品规格'},
+                {field: 'marketPrice', title: '市场价'},
+                {field: 'realPrice', title: '优惠价格', sort: true},
+                {
+                    field: 'state', title: '状态', templet: function (item) {
                         if (item.state == '1') {
                             return "上架";
                         } else if (item.state == '2') {
                             return "下架";
-                        }}},
-                {field: 'note', width: 120, title: '商品说明'},
-                {field: 'num', width: 120,edit: 'num',  title: '库存数量'},
-                {field: 'unit', width: 120, title: '单位'},
-                {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
+                        }
+                    }
+                },
+                {field: 'note', title: '商品说明'},
+                {field: 'num', edit: 'num', title: '库存数量'},
+                {field: 'goodsNum', edit: 'num', title: '数量'},
+                {field: 'unit', title: '单位'},
+                {title: '操作', toolbar: '#currentTableBar', align: "center"}
             ]],
-            limits: [10, 15, 20, 25, 50, 100],
-            limit: 15,
+            limits: [1, 5, 10, 15, 25, 50],
+            limit: 5,
             page: true,
             skin: 'line'
         });
 
 
-        $('.demoTable .layui-btn').on('click', function(){
+        $('.demoTable .layui-btn').on('click', function () {
 
             var search = $("input[name='goodsName']").val();
             table.render({
-                elem:'#currentTableId'
-                ,url:'http://localhost:8080/goods/findgoodsName.do?goodsName='+search
-                , parseData:function(res){//res 即为原始返回的数据
+                elem: '#currentTableId'
+                , url: 'http://localhost:8080/goods/findgoodsName.do?goodsName=' + search
+                , parseData: function (res) {//res 即为原始返回的数据
                     console.log(res)
                     return {
-                        "code":0,
-                        "msg":"",
-                        "count":5,
-                        data:res};
+                        "code": res.code,
+                        "msg": res.msg,
+                        "count": res.count,
+                        "data": res.data.list,
+                        id: res.data.list.id
+                    };
                 }, cols: [[
-                    {type: "checkbox", width: 50},
-                    {field: 'goodsName', width: 120, title: '商品名称', sort: true},
-                    {field: 'goodsFormat', width: 100, title: '商品规格'},
-                    {field: 'marketPrice', width: 100, title: '市场价'},
-                    {field: 'realPrice', width:120, title: '优惠价格',sort: true},
-                    {field: 'state', width: 80, title: '状态',templet: function (item) {
+                    {type: "checkbox"},
+                    {field: 'goodsName', title: '商品名称', sort: true},
+                    {field: 'goodsFormat', title: '商品规格'},
+                    {field: 'marketPrice', title: '市场价'},
+                    {field: 'realPrice', title: '优惠价格', sort: true},
+                    {
+                        field: 'state', title: '状态', templet: function (item) {
                             if (item.state == '1') {
                                 return "上架";
                             } else if (item.state == '2') {
                                 return "下架";
-                            }}},
-                    {field: 'note', width: 120, title: '商品说明'},
-                    {field: 'num', width: 120,edit: 'num',  title: '库存数量'},
-                    {field: 'unit', width: 120, title: '单位'},
-                    {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
+                            }
+                        }
+                    },
+                    {field: 'note', title: '商品说明'},
+                    {field: 'num', title: '库存数量'},
+                    {field: 'goodsNum', edit: 'num', title: '数量'},
+                    {field: 'unit', title: '单位'},
+                    {title: '操作', toolbar: '#currentTableBar', align: "center"}
                 ]],
-                limits: [10, 15, 20, 25, 50, 100],
-                limit: 15,
+                limits: [1, 5, 10, 15, 20, 30],
+                limit: 5,
                 page: true,
                 skin: 'line'
             })
@@ -128,63 +154,64 @@
          * toolbar监听事件
          */
         table.on('toolbar(currentTableFilter)', function (obj) {
-            if (obj.event === 'delete') {  // 监听添加操作
-                var index = layer.open({
-                    title: '添加商品',
-                    type: 2,
-                    shade: 0.2,
-                    maxmin:true,
-                    shadeClose: true,
-                    area: ['100%', '100%'],
-                    content: 'goods_add.html',
-                });
-                $(window).on("resize", function () {
-                    layer.full(index);
-                });
-            }
+
+                if (obj.event === 'delete') {  // 监听添加操作
+                    var index = layer.open({
+                        title: '添加商品',
+                        type: 2,
+                        shade: 0.2,
+                        maxmin: true,
+                        shadeClose: true,
+                        area: ['100%', '100%'],
+                        content: 'goods_add.html',
+                    });
+                    $(window).on("resize", function () {
+                        layer.full(index);
+                    });
+                }
+
         });
 
-        var createBy=""
 
-        $.ajax({
-            url: "http://localhost:8080/session.do",
-            type: "post",
-            dataType: "json",
-            async: false,
-            xhrFields: {
-                withCredentials: true
-            },
-            success: function(rec) {
-                createBy = rec.data.username;
-            }
-
-        })
         table.on('tool(currentTableFilter)', function (obj) {
+            let val = obj.data.goodsNum;
+            let num = obj.data.num;
             var data = obj.data;
-            console.log("data="+data.id)
-            console.log("datanum="+data.num)
-            console.log("datanum="+data.goodsName)
+            if (data.goodsNum == undefined) {
+                layer.msg('添加数量不能为空');
+                return false;
+            }
+            if (num <= val) {
+                layer.msg('库存数量不足');
+                return false;
+            }
             if (obj.event === 'delete') {
-                form.on('submit(modify)', function ( ) {
+                form.on('submit(modify)', function () {
                     $.ajax({
-                        url:"http://localhost:8080/cart/addone.do?goodsId="+data.id+"&goodsName="+data.goodsName+"&goodsPrice="+data.realPrice+"&goodsNum="+data.num+"&createBy="+createBy,
-                        type:"post",
-                        data:data,
-                        dataType:"json",
-                        async: false,
-                        xhrFields:{
-                            withCredentials:true
+                        url: "http://localhost:8080/cart/addone.do",
+                        type: "post",
+                        data: {
+                            goodsId: data.id,
+                            goodsName: data.goodsName,
+                            goodsPrice: data.realPrice,
+                            goodsNum: data.goodsNum,
+                            createBy: username
                         },
-                        success:function (rec) {
+                        dataType: "json",
+                        async: false,
+                        xhrFields: {
+                            withCredentials: true
+                        },
+                        success: function (rec) {
 
                             layer.msg(rec.msg);
-                            layui.use('layer', function(){
-                                var layer = layui.layer;
-                                layer.alert("已添加到购物车！",
-                                    function () {
-                                        window.parent.location.reload();//刷新父页面
-                                     }
-                                );
+                            layui.use('layer', function () {
+                                if (rec.code == 0) {
+                                    alert(rec.msg)
+                                    window.parent.location.reload();
+                                } else {
+                                    alert(rec.msg)
+                                }
                             });
 
                         }

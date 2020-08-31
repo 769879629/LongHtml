@@ -141,13 +141,13 @@
           "target": "_self",
           "child": [
             {
-              "title": "汇款充值",
+              "title": "充值入口",
               "href": "account_pay.html",
               "icon": "fa fa-tachometer",
               "target": "_self"
             },
             {
-              "title": "汇款明细",
+              "title": "充值明细",
               "href": "account_detail.html",
               "icon": "fa fa-tachometer",
               "target": "_self"
@@ -166,7 +166,7 @@
               "target": "_self"
             } ,
             {
-              "title": "提现明细",
+              "title": "消费明细",
               "href": "account_deplist.html",
               "icon": "fa fa-tachometer",
               "target": "_self"
@@ -188,6 +188,13 @@
             {
               "title": "资讯管理",
               "href": "information_find.html",
+              "icon": "fa fa-tachometer",
+              "target": "_self"
+            }
+          ,
+            {
+              "title": "下载管理",
+              "href": "download_list.html",
               "icon": "fa fa-tachometer",
               "target": "_self"
             }
@@ -227,7 +234,7 @@
             ,
             {
               "title": "报表管理",
-              "href": "a4.html",
+              "href": "sign_chart.html",
               "icon": "fa fa-tachometer",
               "target": "_self"
             }
